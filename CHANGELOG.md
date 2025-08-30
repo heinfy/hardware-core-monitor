@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.2...v1.0.3) (2025-08-30)
+
+### Bug Fixes
+
+- CI ([d55a179](https://github.com/heinfy/hardware-core-monitor/commit/d55a1792130c700d1c6ae1d2d75ff5237ca7d5cf))
+
 ## [1.0.2](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.0.2) (2025-08-30)
 
 ### Bug Fixes
