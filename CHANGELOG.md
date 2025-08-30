@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.0.2) (2025-08-30)
+
+### Bug Fixes
+
+- Tag ([fab0104](https://github.com/heinfy/hardware-core-monitor/commit/fab010443848abf4a7998b9d387fe0bbade48e23))
+
 ## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2025-08-30)
 
 ### Bug Fixes
