@@ -4,21 +4,43 @@ env:
   NODE_VERSION: 20.x
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
 
 jobs:
   # ================================
   # Job 2: 打包并发布到 VS Code 市场
   # ================================
   publish-extension:
-    name: 📦 构建发布 VScode 插件
+    name: 📦 发布 VScode 插件
     runs-on: ubuntu-latest
+    # 条件 1: 如果是 push 事件, 确保由 tag 触发
+    # 条件 2: 如果是 workflow_dispatch 事件, 则通过后续步骤判断
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
-      - name: 🔍 1. 拉取代码（包含新版本号的 package.json）
+      # 步骤 1: 检查是否为 Tag 引用
+      - name: 检查是否为 Tag 引用
+        id: check_tag
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "✅ 触发自 Tag: ${{ github.ref }}"
+            echo "is_tag=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ 工作流未由 Tag 触发。当前引用为: ${{ github.ref }}"
+            echo "::error::此工作流仅允许在 Tag 上运行。请确保您手动触发时选择了正确的引用。"
+            echo "is_tag=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 步骤 2: 只有当 is_tag 为 true 时才继续
+      - name: 只有当 is_tag 为 true 时才继续
+        if: steps.check_tag.outputs.is_tag != 'true'
+        run: exit 1
+
+      - name: 🔍 1. 拉取代码
+        if: steps.check_tag.outputs.is_tag == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
