@@ -49,7 +49,48 @@ jobs:
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
-        run: npx semantic-release --debug
+        run: |
+          echo "🔍 4.1 开始执行 semantic-release..."
+          set +e  # 允许捕获错误而不立即退出
+          OUTPUT=$(npx semantic-release --debug 2>&1)
+          EXIT_CODE=$?
+          set -e
+
+          echo "📋 4.2 semantic-release 执行结果："
+          echo "$OUTPUT"
+
+          # 检查是否发布了新版本
+          if echo "$OUTPUT" | grep -q "Published release"; then
+            echo "✅ 4.3 检测到新版本已发布"
+
+            # 提取新旧版本号
+            NEW_VERSION=$(echo "$OUTPUT" | grep -oP 'The next release version is \K\d+\.\d+\.\d+')
+            PREVIOUS_TAG=$(git tag -l 'v*' --sort=-version:refname | grep -v "$NEW_VERSION" | head -n1 || echo "")
+
+            # 设置输出变量
+            echo "new_release_published=true" >> $GITHUB_OUTPUT
+            echo "new_release_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "current_tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+
+            # 提取 CHANGELOG 预览（最多前 5 行）
+            if [[ -f "CHANGELOG.md" ]]; then
+              PREVIEW=$(grep -A 5 "^## \\[v\\?$NEW_VERSION\\?\\]" CHANGELOG.md | head -n 5 | sed "s/'/''/g" | tr '\n' ' ')
+              echo "changelog_preview='$PREVIEW'" >> $GITHUB_OUTPUT
+            fi
+
+            echo "🎉 发布成功：v$NEW_VERSION"
+          else
+            echo "ℹ️ 4.4 无需发布新版本（无符合规则的提交）"
+            echo "new_release_published=false" >> $GITHUB_OUTPUT
+            echo "new_release_version=" >> $GITHUB_OUTPUT
+            echo "current_tag=" >> $GITHUB_OUTPUT
+            echo "previous_tag=" >> $GITHUB_OUTPUT
+            echo "changelog_preview=" >> $GITHUB_OUTPUT
+          fi
+
+          # 强制返回原始 exit code，确保 CI 正确反映发布失败
+          exit $EXIT_CODE
 
       - name: 🐞 5. 调试输出
         if: always()
