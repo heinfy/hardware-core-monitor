@@ -21,8 +21,7 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
-      # 步骤 1: 检查是否为 Tag 引用
-      - name: 检查是否为 Tag 引用
+      - name: 🔍 1. 检查是否为 Tag 引用
         id: check_tag
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
@@ -30,28 +29,27 @@ jobs:
             echo "is_tag=true" >> $GITHUB_OUTPUT
           else
             echo "❌ 工作流未由 Tag 触发。当前引用为: ${{ github.ref }}"
-            echo "::error::此工作流仅允许在 Tag 上运行。请确保您手动触发时选择了正确的引用。"
+            echo "::error::此工作流仅允许在 Tag 上运行，而不是 Branch。请确保您手动触发时在 Use workflow from 选择了正确的 Tag 引用（例如：Tag 为 v1.2.3）。"
             echo "is_tag=false" >> $GITHUB_OUTPUT
           fi
 
-      # 步骤 2: 只有当 is_tag 为 true 时才继续
-      - name: 只有当 is_tag 为 true 时才继续
+      - name: ❓ 2. 只有当 is_tag 为 true 时才继续
         if: steps.check_tag.outputs.is_tag != 'true'
         run: exit 1
 
-      - name: 🔍 1. 拉取代码
+      - name: 🔍 3. 拉取代码
         if: steps.check_tag.outputs.is_tag == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
 
-      - name: ⚙️ 2. 设置 Node.js 环境
+      - name: ⚙️ 4. 设置 Node.js 环境
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 📋 3. 获取版本号
+      - name: 📋 5. 获取版本号
         id: get_info
         run: |
           name=$(node -p "require('./package.json').name")
@@ -62,17 +60,17 @@ jobs:
           echo "👉👉👉 版本号: $version"
           echo "👉👉👉 ${{ github.ref_name }}"
 
-      - name: 📦 4. 安装依赖
+      - name: 📥 6. 安装依赖
         run: npm ci
 
-      - name: === 打包扩展
+      - name: 📦 7. 打包扩展
         id: package_extension
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: stub
           dryRun: true
 
-      - name: 🚀 5. 上传到 GitHub Releases
+      - name: 🚀 8. 上传到 GitHub Releases
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.MY_PERSONAL_TOKEN }}
@@ -81,14 +79,14 @@ jobs:
           overwrite: true
           tag: ${{ github.ref_name }}
 
-      - name: 🚀 6. 上传到 VSCode Marketplace
+      - name: 🚀 9. 上传到 VSCode Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
           extensionFile: ${{ steps.package_extension.outputs.vsixPath }}
 
-      - name: 🚀 7. 上传到 GitHub Artifact
+      - name: 🚀 10. 上传到 GitHub Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.get_info.outputs.name }}-${{ steps.get_info.outputs.version }}

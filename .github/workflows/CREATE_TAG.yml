@@ -50,3 +50,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
         run: npx semantic-release --debug
+
+      - name: 🐞 5. 调试输出
+        if: always()
+        run: |
+          echo "✅ ==== LOG === ✅"
+          echo "👉 需要发布 : ${{ steps.release.outputs.new_release_published }}"
+          echo "👉 当前版本: ${{ steps.release.outputs.new_release_version }}"
+          echo "👉 当前版本  Tag: ${{ steps.release.outputs.current_tag }}"
+          echo "👉 上个版本 Tag: ${{ steps.release.outputs.previous_tag }}"
+          echo "👉 日志预览: ${{ steps.release.outputs.changelog_preview }}"
