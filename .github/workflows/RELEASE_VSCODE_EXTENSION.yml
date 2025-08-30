@@ -5,6 +5,11 @@ env:
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to release (e.g. v1.2.3)'
+        required: true
+        type: string
   push:
     tags:
       - 'v*.*.*'
