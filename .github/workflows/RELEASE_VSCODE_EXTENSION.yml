@@ -1,0 +1,73 @@
+name: Release VScode Extension
+
+env:
+  NODE_VERSION: 20.x
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  # ================================
+  # Job 2: 打包并发布到 VS Code 市场
+  # ================================
+  publish-extension:
+    name: 📦 构建发布 VScode 插件
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔍 1. 拉取代码（包含新版本号的 package.json）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
+
+      - name: ⚙️ 2. 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📋 3. 获取版本号
+        id: get_info
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          echo "name=$name" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "👉👉👉 插件名: $name"
+          echo "👉👉👉 版本号: $version"
+          echo "👉👉👉 ${{ github.ref_name }}"
+
+      - name: 📦 4. 安装依赖
+        run: npm ci
+
+      - name: === 打包扩展
+        id: package_extension
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: stub
+          dryRun: true
+
+      - name: 🚀 5. 上传到 GitHub Releases
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.MY_PERSONAL_TOKEN }}
+          file_glob: true
+          file: ${{ steps.package_extension.outputs.vsixPath }}
+          overwrite: true
+          tag: ${{ github.ref_name }}
+
+      - name: 🚀 6. 上传到 VSCode Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+          extensionFile: ${{ steps.package_extension.outputs.vsixPath }}
+
+      - name: 🚀 7. 上传到 GitHub Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get_info.outputs.name }}-${{ steps.get_info.outputs.version }}
+          path: ${{ steps.package_extension.outputs.vsixPath }}

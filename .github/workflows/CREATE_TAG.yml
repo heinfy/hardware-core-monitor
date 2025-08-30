@@ -1,0 +1,52 @@
+name: Create Tag
+
+env:
+  NODE_VERSION: 20.x # 设置 Node.js 版本环境变量
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # =====================
+  # Job 1: 自动化语义化版本发布（生成版本号、打 tag、更新 CHANGELOG）
+  # =====================
+  release:
+    name: 🚀 Semantic 版本发布
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    # 跳过 CI 的提交
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+
+    outputs:
+      new_release_published: ${{ steps.release.outputs.new_release_published }}
+      new_release_version: ${{ steps.release.outputs.new_release_version }}
+      current_tag: ${{ steps.release.outputs.current_tag }}
+      previous_tag: ${{ steps.release.outputs.previous_tag }}
+      changelog_preview: ${{ steps.release.outputs.changelog_preview }}
+
+    steps:
+      - name: 🔍 1. 拉取代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
+
+      - name: ⚙️ 2. 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 3. 安装依赖
+        run: npm ci
+
+      - name: 📢 4. 执行 semantic-release
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
+        run: npx semantic-release --debug
