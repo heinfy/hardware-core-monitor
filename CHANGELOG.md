@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.4...v1.0.5) (2025-08-30)
+
+### Performance Improvements
+
+- workflow ([78b90f6](https://github.com/heinfy/hardware-core-monitor/commit/78b90f6df8f531d111480a9b4bdf6efa8347e1e4))
+
 ## [1.0.4](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.3...v1.0.4) (2025-08-30)
 
 ### Performance Improvements
