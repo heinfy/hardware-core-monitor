@@ -122,17 +122,29 @@ jobs:
             # 提取 CHANGELOG 预览（最多前 5 行）
             if [ -f "CHANGELOG.md" ]; then
               PREVIEW=$(
-                grep -A 5 -E "^## \[v?${NEW_VERSION}\]" CHANGELOG.md |
-                  head -n 5 |
-                  sed "s/'/''/g" |
-                  tr '\n' ' '
+                awk -v version="$NEW_VERSION" '
+                  $0 ~ "^## \\[v?" version "\\]" {
+                    found = 1
+                    count = 0
+                  }
+
+                  found && count < 5 {
+                    line = $0
+                    gsub(/\047/, "\047\047", line)
+                    printf "%s ", line
+                    count++
+
+                    if (count >= 5) {
+                      exit
+                    }
+                  }
+                ' CHANGELOG.md
               )
 
               echo "changelog_preview=$PREVIEW" >> "$GITHUB_OUTPUT"
             else
               echo "changelog_preview=" >> "$GITHUB_OUTPUT"
             fi
-
             echo "🎉 [5/6] 发布成功：v$NEW_VERSION"
           else
             echo "ℹ️ [5/6] 无需发布新版本（无符合规则的提交）"
