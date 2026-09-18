@@ -118,7 +118,7 @@ jobs:
             --packagePath "${{ steps.package_extension.outputs.vsixPath }}"
 
       - name: 🚀 11. 上传到 GitHub Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.get_info.outputs.name }}-${{ steps.get_info.outputs.version }}
           path: ${{ steps.package_extension.outputs.vsixPath }}
