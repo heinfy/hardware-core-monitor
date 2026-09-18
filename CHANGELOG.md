@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.2...v1.0.3) (2026-09-18)
+
+### Bug Fixes
+
+- **release:** bump version to 1.0.5 in package.json ([12ea162](https://github.com/heinfy/hardware-core-monitor/commit/12ea162a281d78579a03fb0343b0ba17af92c9c4))
+
 ## [1.0.2](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.0.2) (2026-09-18)
 
 ### Bug Fixes
