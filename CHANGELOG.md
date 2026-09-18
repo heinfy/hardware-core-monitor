@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.0.2) (2026-09-18)
+
+### Bug Fixes
+
+- update upload-artifact action to v6 in release workflow ([42fcca1](https://github.com/heinfy/hardware-core-monitor/commit/42fcca11afb26042444f48080b7d2be8259d94aa))
+
 ## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2026-09-18)
 
 ### Bug Fixes
