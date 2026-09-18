@@ -89,9 +89,12 @@ jobs:
           if grep -q "Published release" <<< "$OUTPUT"; then
             echo "✅ [5/6] 检测到新版本已发布"
 
-            # 提取新版本号
+            # 提取新版本号，兼容 semantic-release 的不同日志格式
             NEW_VERSION=$(
-              grep -oP 'The next release version is \K\d+\.\d+\.\d+' <<< "$OUTPUT" |
+              printf '%s\n' "$OUTPUT" |
+                sed -nE \
+                  -e 's/.*The next release version is ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' \
+                  -e 's/.*Published release ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' |
                 head -n 1
             )
 
