@@ -1,0 +1,247 @@
+/* 使用 VSCode 主题变量，保证亮暗主题下观感一致 */
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.toolbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.updated-at {
+  color: var(--vscode-descriptionForeground);
+}
+
+button {
+  padding: 6px 14px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 4px;
+  color: var(--vscode-button-foreground);
+  background-color: var(--vscode-button-background);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
+  border-radius: 8px;
+  background-color: var(--vscode-editorWidget-background);
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--vscode-foreground);
+}
+
+.card-header h2 {
+  margin: 0;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.badge-normal {
+  color: var(--vscode-charts-blue);
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-charts-blue) 18%,
+    transparent
+  );
+}
+
+.badge-warning {
+  color: var(--vscode-editorWarning-foreground);
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-editorWarning-foreground) 18%,
+    transparent
+  );
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-descriptionForeground) 18%,
+    transparent
+  );
+}
+
+.progress-track.small {
+  height: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+  background-color: var(--vscode-charts-blue);
+  transition: width 0.3s ease;
+}
+
+.progress-fill.warning {
+  background-color: var(--vscode-charts-red);
+}
+
+.core-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.core {
+  display: grid;
+  gap: 4px;
+}
+
+.core-label,
+.core-value {
+  font-size: 0.8rem;
+  color: var(--vscode-descriptionForeground);
+}
+
+.core-value {
+  text-align: right;
+}
+
+.stack-list {
+  display: grid;
+  gap: 14px;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.network-speed {
+  display: inline-flex;
+  gap: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.disk-item {
+  display: grid;
+  gap: 6px;
+}
+
+.kv-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.kv-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.kv-list dt {
+  color: var(--vscode-descriptionForeground);
+}
+
+.kv-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+.muted {
+  color: var(--vscode-descriptionForeground);
+}
+
+.loading {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+}
+
+.error-box {
+  padding: 20px;
+  border: 1px solid var(--vscode-inputValidation-errorBorder);
+  border-radius: 8px;
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-editorError-foreground) 10%,
+    transparent
+  );
+}
+
+.error-box h2 {
+  margin-top: 0;
+}
+
+@media (max-width: 720px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .span-2 {
+    grid-column: auto;
+  }
+}

@@ -1,14 +1,22 @@
+# 开发与 CI 相关文件不进入 VSIX
 .vscode/**
 .vscode-test/**
-out/**
-node_modules/**
+.github/**
+.husky/**
 src/**
-.gitignore
-.yarnrc
-esbuild.js
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/eslint.config.mjs
+webview/**
+out/**/*.map
+dist/**/*.map
 **/*.map
 **/*.ts
+**/tsconfig.json
+**/eslint.config.mjs
 **/.vscode-test.*
+esbuild.js
+commitlint.config.js
+.releaserc.json
+node_modules/.cache/**
+node_modules/.package-lock.json
+
+# 注意：out/extension.js、dist/webview 与 node_modules/systeminformation
+# 是运行时必需内容，不能被忽略。

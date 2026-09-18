@@ -4,7 +4,8 @@ const production = process.argv.includes("--production");
 const watch = process.argv.includes("--watch");
 
 /**
- * @type {import('esbuild').Plugin}
+ * esbuild 问题匹配器：把构建错误格式化成 VSCode Problem Matcher 可识别的输出。
+ * @type {import("esbuild").Plugin}
  */
 const esbuildProblemMatcherPlugin = {
   name: "esbuild-problem-matcher",
@@ -13,11 +14,12 @@ const esbuildProblemMatcherPlugin = {
     build.onStart(() => {
       console.log("[watch] build started");
     });
+
     build.onEnd((result) => {
-      result.errors.forEach(({ text, location }) => {
+      for (const { text, location } of result.errors) {
         console.error(`✘ [ERROR] ${text}`);
         console.error(`${location.file}:${location.line}:${location.column}:`);
-      });
+      }
       console.log("[watch] build finished");
     });
   },
@@ -32,14 +34,15 @@ async function main() {
     sourcemap: !production,
     sourcesContent: false,
     platform: "node",
+    target: "ES2022",
     outfile: "out/extension.js",
-    external: ["vscode"],
+
+    // vscode 由扩展宿主提供；systeminformation 含平台相关动态加载，作为外部依赖打进 VSIX
+    external: ["vscode", "systeminformation"],
     logLevel: "silent",
-    plugins: [
-      /* add to the end of plugins array */
-      esbuildProblemMatcherPlugin,
-    ],
+    plugins: [esbuildProblemMatcherPlugin],
   });
+
   if (watch) {
     await ctx.watch();
   } else {
@@ -48,7 +51,7 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

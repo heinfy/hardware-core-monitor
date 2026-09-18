@@ -1,155 +1,179 @@
-import * as path from "path";
-import * as si from "systeminformation";
 import * as vscode from "vscode";
+import type {
+  HostToWebviewMessage,
+  MonitorSnapshot,
+  WebviewToHostMessage,
+} from "./shared/protocol";
+import type { MonitorService } from "./monitorService";
 
-export class DashboardPanel {
-  public static currentPanel: DashboardPanel | undefined;
-  private readonly _panel: vscode.WebviewPanel;
-  private readonly _extensionUri: vscode.Uri;
-  private _disposables: vscode.Disposable[] = [];
+/** React Webview 的面板视图类型 */
+export const DashboardViewType = "hardware-core-monitor.dashboard";
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-    this._panel = panel;
-    this._extensionUri = extensionUri;
+/**
+ * React 仪表盘面板。
+ *
+ * 职责边界：
+ * - 创建 WebviewPanel 并注入安全的 CSP；
+ * - 加载 Vite 构建产物（或开发环境的 Vite Dev Server）；
+ * - 在 MonitorService 与 React 页面之间转发消息。
+ *
+ * 面板本身不做数据采集，也不包含渲染逻辑。
+ */
+export class DashboardPanel implements vscode.Disposable {
+  private static currentPanel: DashboardPanel | undefined;
 
-    this._update();
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+  private readonly disposables: vscode.Disposable[] = [];
+
+  private constructor(
+    private readonly panel: vscode.WebviewPanel,
+    private readonly extensionUri: vscode.Uri,
+    private readonly monitorService: MonitorService,
+  ) {
+    panel.webview.html = this.getHtml(panel.webview);
+
+    // 处理来自 React 页面的消息
+    panel.webview.onDidReceiveMessage(
+      (message: WebviewToHostMessage) => {
+        if (message.type === "ready" || message.type === "refresh") {
+          // 页面加载完成或用户手动刷新时，立即采集一次
+          this.monitorService.requestNow();
+
+          // 如果已有缓存快照，先补发，避免页面空白等待
+          if (this.monitorService.latestSnapshot) {
+            void this.postSnapshot(this.monitorService.latestSnapshot);
+          }
+        }
+      },
+      this,
+      this.disposables,
+    );
+
+    // 数据更新时转发给 Webview
+    this.monitorService.onDidChangeSnapshot(
+      (snapshot) => void this.postSnapshot(snapshot),
+      this,
+      this.disposables,
+    );
+
+    // 采集失败时把错误信息发给 Webview 展示
+    this.monitorService.onDidError(
+      (message) => {
+        void this.panel.webview.postMessage({
+          type: "error",
+          message,
+        } satisfies HostToWebviewMessage);
+      },
+      this,
+      this.disposables,
+    );
+
+    this.panel.onDidDispose(() => this.dispose(), this, this.disposables);
   }
 
-  public static createOrShow(extensionUri: vscode.Uri) {
-    const column = vscode.window.activeTextEditor
-      ? vscode.window.activeTextEditor.viewColumn
-      : undefined;
+  /** 创建面板；如果已存在则直接显示 */
+  static createOrShow(
+    context: vscode.ExtensionContext,
+    monitorService: MonitorService,
+  ): void {
+    const column = vscode.window.activeTextEditor?.viewColumn;
 
     if (DashboardPanel.currentPanel) {
-      DashboardPanel.currentPanel._panel.reveal(column);
+      DashboardPanel.currentPanel.panel.reveal(column);
       return;
     }
 
     const panel = vscode.window.createWebviewPanel(
-      "hardwareDashboard",
+      DashboardViewType,
       "Hardware Dashboard",
-      column || vscode.ViewColumn.One,
+      column ?? vscode.ViewColumn.One,
       {
         enableScripts: true,
+
+        // 隐藏时保留 React 状态，重新打开不需要重新初始化
+        retainContextWhenHidden: true,
         localResourceRoots: [
-          vscode.Uri.joinPath(extensionUri, "media"),
-          vscode.Uri.joinPath(extensionUri, "out/compiled"),
+          vscode.Uri.joinPath(context.extensionUri, "dist/webview"),
         ],
       },
     );
 
-    DashboardPanel.currentPanel = new DashboardPanel(panel, extensionUri);
+    DashboardPanel.currentPanel = new DashboardPanel(
+      panel,
+      context.extensionUri,
+      monitorService,
+    );
   }
 
-  private async _update() {
-    const webview = this._panel.webview;
-    this._panel.webview.html = this._getHtmlForWebview(webview);
-
-    // 定期更新数据
-    setInterval(async () => {
-      const data = await this.getHardwareData();
-      webview.postMessage({ type: "update", data });
-    }, 2000);
+  /** 发送快照给 Webview */
+  private async postSnapshot(snapshot: MonitorSnapshot): Promise<void> {
+    await this.panel.webview.postMessage({
+      type: "snapshot",
+      snapshot,
+    } satisfies HostToWebviewMessage);
   }
 
-  private async getHardwareData() {
-    try {
-      const [cpu, memory, disk, temperature] = await Promise.all([
-        si.currentLoad(),
-        si.mem(),
-        si.fsSize(),
-        si.cpuTemperature(),
-      ]);
+  /** 生成 Webview HTML，包含 CSP 与资源引用 */
+  private getHtml(webview: vscode.Webview): string {
+    // 开发环境：配合 launch.json 里的 WEBVIEW_DEV_SERVER_URL 使用 Vite Dev Server
+    const devServerUrl = process.env["WEBVIEW_DEV_SERVER_URL"];
 
-      return {
-        cpu: {
-          usage: cpu.currentLoad,
-          cores: cpu.cpus,
-        },
-        memory: {
-          total: memory.total,
-          used: memory.used,
-          free: memory.free,
-        },
-        disk: disk.map((d) => ({
-          mount: d.mount,
-          size: d.size,
-          used: d.used,
-          usage: (d.used / d.size) * 100,
-        })),
-        temperature: temperature.main,
-      };
-    } catch (error) {
-      console.error("Error getting hardware data:", error);
-      return null;
+    let scriptUri: vscode.Uri | string;
+    let styleUri: vscode.Uri | string | undefined;
+    let csp: string;
+
+    if (devServerUrl) {
+      scriptUri = `${devServerUrl}/src/main.tsx`;
+      styleUri = `${devServerUrl}/src/styles/global.css`;
+      csp = [
+        "default-src 'none'",
+        `script-src ${devServerUrl} 'unsafe-inline' 'unsafe-eval'`,
+        `style-src ${devServerUrl} 'unsafe-inline'`,
+        `connect-src ${devServerUrl} ws://localhost:5173 http://localhost:5173`,
+        "img-src data: blob:",
+      ].join("; ");
+    } else {
+      // 生产环境：加载 Vite 固定文件名产物
+      scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this.extensionUri, "dist/webview/assets/index.js"),
+      );
+      styleUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this.extensionUri, "dist/webview/assets/index.css"),
+      );
+
+      // 生产 CSP 只允许加载 Webview 内部资源
+      csp = [
+        "default-src 'none'",
+        `script-src ${webview.cspSource}`,
+        `style-src ${webview.cspSource}`,
+        `img-src ${webview.cspSource} data:`,
+        `font-src ${webview.cspSource}`,
+      ].join("; ");
     }
+
+    return /* html */ `<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="${csp}" />
+    <link rel="stylesheet" href="${styleUri}" />
+    <title>Hardware Dashboard</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="${scriptUri}"></script>
+  </body>
+</html>`;
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
-    const scriptPath = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "dashboard.js"),
-    );
-
-    const stylePath = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "dashboard.css"),
-    );
-
-    return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link href="${stylePath}" rel="stylesheet">
-            <title>Hardware Dashboard</title>
-        </head>
-        <body>
-            <div class="dashboard">
-                <h1>Hardware Monitor Dashboard</h1>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h2>CPU Usage</h2>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="cpu-progress"></div>
-                            <span id="cpu-text">0%</span>
-                        </div>
-                        <div id="cpu-cores"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2>Memory Usage</h2>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="memory-progress"></div>
-                            <span id="memory-text">0%</span>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2>Temperature</h2>
-                        <div class="temperature" id="temperature">0°C</div>
-                    </div>
-
-                    <div class="card">
-                        <h2>Disk Usage</h2>
-                        <div id="disk-usage"></div>
-                    </div>
-                </div>
-            </div>
-
-            <script src="${scriptPath}"></script>
-        </body>
-        </html>`;
-  }
-
-  public dispose() {
+  dispose(): void {
     DashboardPanel.currentPanel = undefined;
-    this._panel.dispose();
-    while (this._disposables.length) {
-      const x = this._disposables.pop();
-      if (x) {
-        x.dispose();
-      }
+
+    while (this.disposables.length > 0) {
+      const disposable = this.disposables.pop();
+      disposable?.dispose();
     }
+
+    this.panel.dispose();
   }
 }

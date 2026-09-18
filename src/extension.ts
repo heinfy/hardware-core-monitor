@@ -1,56 +1,111 @@
-import * as si from "systeminformation";
 import * as vscode from "vscode";
 import { DashboardPanel } from "./dashboardPanel";
-import { HardwareMonitorProvider } from "./hardwareMonitorProvider";
+import { HardwareTreeProvider } from "./hardwareTreeProvider";
+import { MonitorService } from "./monitorService";
+import { StatusBarController } from "./statusBarController";
+import { ThresholdAlerter } from "./thresholdAlerter";
 
-export let statusBarItem: vscode.StatusBarItem;
-export let monitorProvider: HardwareMonitorProvider;
+/** 插件配置命名空间 */
+const CONFIG_SECTION = "hardwareCoreMonitor";
 
-export function activate(context: vscode.ExtensionContext) {
-  console.log("Hardware Core Monitor is now active!");
+/** 默认刷新间隔（毫秒） */
+const DEFAULT_REFRESH_INTERVAL = 2000;
 
-  // 创建状态栏项
-  statusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Right,
-    100,
-  );
-  statusBarItem.command = "hardware-core-monitor.showDashboard";
-  context.subscriptions.push(statusBarItem);
+/**
+ * 插件入口。
+ *
+ * 这里只做装配：创建唯一的 MonitorService，并把它的数据流
+ * 分发给 TreeView、StatusBar、阈值告警和 React 仪表盘。
+ */
+export function activate(context: vscode.ExtensionContext): void {
+  const interval = getRefreshInterval();
 
-  // 创建侧边栏提供者
-  monitorProvider = new HardwareMonitorProvider(context);
+  // 唯一的数据源：所有 UI 都订阅它
+  const monitorService = new MonitorService(interval);
+  const treeProvider = new HardwareTreeProvider();
+  const statusBar = new StatusBarController();
+  const alerter = new ThresholdAlerter();
+
   const treeView = vscode.window.createTreeView(
     "hardware-core-monitor.sidebarView",
-    {
-      treeDataProvider: monitorProvider,
-    },
+    { treeDataProvider: treeProvider },
   );
-  context.subscriptions.push(treeView);
 
-  // 注册命令
-  const startCommand = vscode.commands.registerCommand(
+  // 同一份快照同时驱动侧边栏、状态栏和告警
+  monitorService.onDidChangeSnapshot(
+    (snapshot) => {
+      treeProvider.update(snapshot);
+      statusBar.update(snapshot);
+      alerter.update(snapshot);
+    },
+    undefined,
+    context.subscriptions,
+  );
+
+  const startMonitoring = vscode.commands.registerCommand(
     "hardware-core-monitor.startMonitoring",
     () => {
-      monitorProvider.startMonitoring();
-      vscode.window.showInformationMessage("Hardware monitoring started");
+      monitorService.start();
+      void vscode.window.showInformationMessage("硬件监控已开始");
     },
   );
 
-  const showDashboardCommand = vscode.commands.registerCommand(
+  const stopMonitoring = vscode.commands.registerCommand(
+    "hardware-core-monitor.stopMonitoring",
+    () => {
+      monitorService.stop();
+      void vscode.window.showInformationMessage("硬件监控已暂停");
+    },
+  );
+
+  const showDashboard = vscode.commands.registerCommand(
     "hardware-core-monitor.showDashboard",
     () => {
-      DashboardPanel.createOrShow(context.extensionUri);
+      DashboardPanel.createOrShow(context, monitorService);
     },
   );
 
-  context.subscriptions.push(startCommand, showDashboardCommand);
+  // 配置变化时动态调整刷新间隔
+  const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
+    (event) => {
+      if (event.affectsConfiguration(CONFIG_SECTION)) {
+        monitorService.updateInterval(getRefreshInterval());
+      }
+    },
+  );
 
-  // 自动开始监控
-  monitorProvider.startMonitoring();
+  // VSCode 会统一清理这些资源
+  context.subscriptions.push(
+    monitorService,
+    treeView,
+    statusBar,
+    alerter,
+    startMonitoring,
+    stopMonitoring,
+    showDashboard,
+    onDidChangeConfiguration,
+  );
+
+  // 按用户配置决定是否在激活后自动开始监控
+  if (getEnabledOnStartup()) {
+    monitorService.start();
+  }
 }
 
-export function deactivate() {
-  if (monitorProvider) {
-    monitorProvider.stopMonitoring();
-  }
+export function deactivate(): void {
+  // 清理逻辑由 context.subscriptions 统一处理，这里不需要额外工作
+}
+
+/** 读取“启动时自动监控”配置 */
+function getEnabledOnStartup(): boolean {
+  return vscode.workspace
+    .getConfiguration(CONFIG_SECTION)
+    .get<boolean>("enabledOnStartup", true);
+}
+
+/** 读取用户配置的刷新间隔 */
+function getRefreshInterval(): number {
+  return vscode.workspace
+    .getConfiguration(CONFIG_SECTION)
+    .get<number>("refreshInterval", DEFAULT_REFRESH_INTERVAL);
 }
