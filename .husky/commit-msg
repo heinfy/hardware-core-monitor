@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# 跳过 semantic-release 生成的 commit
+# 规则：如果 message 以 "chore(release):" 开头，或者包含 "[skip ci]"，直接通过
+case "$commit_msg" in
+  chore\(release\):* | *"[skip ci]"* )
+    echo "🟢 Skip commitlint for release commit: $commit_msg"
+    exit 0
+    ;;
+esac
+
+npx --no-install commitlint --edit $1

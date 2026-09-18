@@ -1,0 +1,42 @@
+## [1.0.6](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.5...v1.0.6) (2026-09-18)
+
+### Bug Fixes
+
+- demo ([099ffcf](https://github.com/heinfy/hardware-core-monitor/commit/099ffcf5cf5cf58a99b449e7c5284434a208ec31))
+
+## [1.0.5](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.4...v1.0.5) (2025-08-30)
+
+### Performance Improvements
+
+- workflow ([78b90f6](https://github.com/heinfy/hardware-core-monitor/commit/78b90f6df8f531d111480a9b4bdf6efa8347e1e4))
+
+## [1.0.4](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.3...v1.0.4) (2025-08-30)
+
+### Performance Improvements
+
+- 整理 workflow 步骤 ([52639ed](https://github.com/heinfy/hardware-core-monitor/commit/52639edf9f7a5542ab6ea63daf17ed3f88cd19ee))
+
+## [1.0.3](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.2...v1.0.3) (2025-08-30)
+
+### Bug Fixes
+
+- CI ([d55a179](https://github.com/heinfy/hardware-core-monitor/commit/d55a1792130c700d1c6ae1d2d75ff5237ca7d5cf))
+
+## [1.0.2](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.0.2) (2025-08-30)
+
+### Bug Fixes
+
+- Tag ([fab0104](https://github.com/heinfy/hardware-core-monitor/commit/fab010443848abf4a7998b9d387fe0bbade48e23))
+
+## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2025-08-30)
+
+### Bug Fixes
+
+- 整理流水线 ([331f221](https://github.com/heinfy/hardware-core-monitor/commit/331f2210073a4b58ce10e22db6482a82465b40b7))
+
+# 1.0.0 (2025-08-30)
+
+### Bug Fixes
+
+- Dependencies lock file ([4d344fe](https://github.com/heinfy/hardware-core-monitor/commit/4d344fef74d496367291eb83bcd4685494bbe59c))
+- 初始化项目 ([77c154d](https://github.com/heinfy/hardware-core-monitor/commit/77c154dd4d5b1b0a23e731ed773bbaa6637957dc))
