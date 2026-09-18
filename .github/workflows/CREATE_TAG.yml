@@ -38,7 +38,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙️ 2. 设置 pnpm
-        uses: pnpm/action-setup@v7
+        uses: pnpm/action-setup@v6
 
       - name: ⚙️ 3. 设置 Node.js 环境
         uses: actions/setup-node@v7
