@@ -1,7 +1,7 @@
 name: Release VScode Extension
 
 env:
-  NODE_VERSION: 20.x
+  NODE_VERSION: 22.x
 
 on:
   workflow_dispatch:
