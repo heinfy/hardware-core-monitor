@@ -1,0 +1,14 @@
+# 1.0.0 (2026-09-18)
+
+### Bug Fixes
+
+- version ([abc2c6b](https://github.com/heinfy/hardware-core-monitor/commit/abc2c6b7e91cf267b1ff83a5227bb1d5727c7596))
+
+### Features
+
+- **ci:** Update VSCode extension publishing method ([3318235](https://github.com/heinfy/hardware-core-monitor/commit/3318235823702c5429291a86ae521ab516acd722))
+- **webview:** initialize hardware monitoring webview with React and Vite ([49ad1e9](https://github.com/heinfy/hardware-core-monitor/commit/49ad1e98dee65a90349772c1c814c93ea33b46cc))
+
+### Performance Improvements
+
+- **main:** 更新 GitHub Actions 工作流，切换运行环境至 ubuntu-24.04，并添加自动触发 VSCode 插件发布的步骤 ([0ef22ff](https://github.com/heinfy/hardware-core-monitor/commit/0ef22ffd8ae72c32ad94f0ba0c727fbd3a79895d))

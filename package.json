@@ -2,7 +2,7 @@
   "name": "hardware-core-monitor",
   "displayName": "Hardware Core Monitor",
   "description": "Real-time hardware monitoring and system performance tracking directly in VSCode",
-  "version": "1.0.6",
+  "version": "1.0.0",
   "publisher": "HouFei",
   "license": "MIT",
   "repository": {
