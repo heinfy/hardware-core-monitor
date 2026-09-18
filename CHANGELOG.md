@@ -1,3 +1,9 @@
+# 1.0.0 (2026-09-18)
+
+### Features
+
+- **webview:** initialize hardware monitoring webview with React and Vite ([49ad1e9](https://github.com/heinfy/hardware-core-monitor/commit/49ad1e98dee65a90349772c1c814c93ea33b46cc))
+
 ## [1.0.6](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.5...v1.0.6) (2026-09-18)
 
 ### Bug Fixes
