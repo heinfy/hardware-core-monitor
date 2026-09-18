@@ -33,15 +33,15 @@ jobs:
 
     steps:
       - name: 🔍 1. 拉取代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: ⚙️ 2. 设置 pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v7
 
       - name: ⚙️ 3. 设置 Node.js 环境
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
