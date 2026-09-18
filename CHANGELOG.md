@@ -1,3 +1,9 @@
+## [1.0.6](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.3...v1.0.6) (2026-09-19)
+
+### Bug Fixes
+
+- skip previously deleted Marketplace versions and publish 1.0.6
+
 ## [1.0.3](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.2...v1.0.3) (2026-09-18)
 
 ### Bug Fixes
