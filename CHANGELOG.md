@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.1...v1.1.0) (2026-09-18)
+
+### Features
+
+- **ci:** Update VSCode extension publishing method ([3318235](https://github.com/heinfy/hardware-core-monitor/commit/3318235823702c5429291a86ae521ab516acd722))
+
 ## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2026-09-18)
 
 ### Performance Improvements
