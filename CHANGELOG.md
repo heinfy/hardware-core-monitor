@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2026-09-18)
+
+### Performance Improvements
+
+- **main:** 更新 GitHub Actions 工作流，切换运行环境至 ubuntu-24.04，并添加自动触发 VSCode 插件发布的步骤 ([0ef22ff](https://github.com/heinfy/hardware-core-monitor/commit/0ef22ffd8ae72c32ad94f0ba0c727fbd3a79895d))
+
 # 1.0.0 (2026-09-18)
 
 ### Features
