@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.0...v1.0.1) (2026-09-18)
+
+### Bug Fixes
+
+- prevent release workflow pipe failure ([3468301](https://github.com/heinfy/hardware-core-monitor/commit/3468301091cc90785fb476af3de739a37821e403))
+
 # 1.0.0 (2026-09-18)
 
 ### Bug Fixes
