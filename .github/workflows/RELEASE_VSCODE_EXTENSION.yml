@@ -15,7 +15,7 @@ jobs:
   # ================================
   publish-extension:
     name: 📦 发布 VScode 插件
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # 仅需要写 GitHub Release；Marketplace 发布使用专用 PAT
     permissions:
       contents: write

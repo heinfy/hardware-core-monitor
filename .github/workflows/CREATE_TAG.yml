@@ -14,9 +14,10 @@ jobs:
   # =====================
   release:
     name: 🚀 Semantic 版本发布
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
+      actions: write
       contents: write
       issues: write
       pull-requests: write
@@ -145,11 +146,27 @@ jobs:
             } >> "$GITHUB_OUTPUT"
           fi
 
-      - name: 🐞 6. 调试输出
+      - name: 🚀 6. 自动触发 VSCode 插件发布
+        if: steps.release.outputs.new_release_published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.current_tag }}
+        run: |
+          echo "╭────────────────────────────────────────╮"
+          echo "  [6/7] 🚀 自动触发 VSCode 插件发布"
+          echo "╰────────────────────────────────────────╯"
+
+          # GITHUB_TOKEN 创建的 Tag push 不会再触发其他工作流，
+          # 因此在新 Tag 发布成功后，显式以该 Tag 作为 ref 调度发布工作流。
+          gh workflow run RELEASE_VSCODE_EXTENSION.yml --ref "$RELEASE_TAG"
+
+          echo "✅ [6/7] 已调度发布工作流：$RELEASE_TAG"
+
+      - name: 🐞 7. 调试输出
         if: always()
         run: |
           echo "╔══════════════════════════════════════════╗"
-          echo "  [6/6] 🐞 执行结果汇总"
+          echo "  [7/7] 🐞 执行结果汇总"
           echo "╚══════════════════════════════════════════╝"
           echo "  👉 需要发布      : ${{ steps.release.outputs.new_release_published }}"
           echo "  👉 当前版本      : ${{ steps.release.outputs.new_release_version }}"
