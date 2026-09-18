@@ -1,0 +1,109 @@
+/* 使用 VSCode 主题变量，保证亮暗主题下观感一致 */
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+}
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.top-nav .brand {
+  font-weight: 600;
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-links a {
+  color: var(--vscode-foreground);
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.nav-links a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.nav-links a.active {
+  color: var(--vscode-textLink-foreground);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.card {
+  padding: 20px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 8px;
+  background-color: var(--vscode-editor-background);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.metric-list {
+  margin: 0;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+}
+
+.metric-row dt {
+  color: var(--vscode-descriptionForeground);
+}
+
+.metric-row dd {
+  margin: 0;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muted {
+  color: var(--vscode-descriptionForeground);
+}
+
+.error-text {
+  color: var(--vscode-errorForeground);
+}

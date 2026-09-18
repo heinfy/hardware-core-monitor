@@ -36,32 +36,46 @@ jobs:
         with:
           fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
 
-      - name: ⚙️ 2. 设置 Node.js 环境
+      - name: ⚙️ 2. 设置 pnpm
+        uses: pnpm/action-setup@v4
+        # 版本号自动读取 package.json 中的 packageManager 字段（pnpm@11.22.0）
+
+      - name: ⚙️ 3. 设置 Node.js 环境
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm' # 适配 pnpm workspace：缓存 pnpm store（需先安装 pnpm）
 
-      - name: 📦 3. 安装依赖
-        run: npm ci
+      - name: 📦 4. 安装依赖
+        run: |
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [4/6] 📦 安装依赖（pnpm workspace）"
+          echo "╚══════════════════════════════════════════╝"
+          pnpm install --frozen-lockfile
+          echo "✅ [4/6] 依赖安装完成"
 
-      - name: 📢 4. 执行 semantic-release
+      - name: 📢 5. 执行 semantic-release
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
         run: |
-          echo "🔍 4.1 开始执行 semantic-release..."
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [5/6] 📢 执行 semantic-release"
+          echo "╚══════════════════════════════════════════╝"
           set +e  # 允许捕获错误而不立即退出
-          OUTPUT=$(npx semantic-release --debug 2>&1)
+          OUTPUT=$(pnpm exec semantic-release --debug 2>&1)
           EXIT_CODE=$?
           set -e
 
-          echo "📋 4.2 semantic-release 执行结果："
+          echo "──────────────────────────────────────────"
+          echo "  📋 [5/6] semantic-release 执行结果"
+          echo "──────────────────────────────────────────"
           echo "$OUTPUT"
+          echo "──────────────────────────────────────────"
 
           # 检查是否发布了新版本
           if echo "$OUTPUT" | grep -q "Published release"; then
-            echo "✅ 4.3 检测到新版本已发布"
+            echo "✅ [5/6] 检测到新版本已发布"
 
             # 提取新旧版本号
             NEW_VERSION=$(echo "$OUTPUT" | grep -oP 'The next release version is \K\d+\.\d+\.\d+')
@@ -79,9 +93,9 @@ jobs:
               echo "changelog_preview='$PREVIEW'" >> $GITHUB_OUTPUT
             fi
 
-            echo "🎉 发布成功：v$NEW_VERSION"
+            echo "🎉 [5/6] 发布成功：v$NEW_VERSION"
           else
-            echo "ℹ️ 4.4 无需发布新版本（无符合规则的提交）"
+            echo "ℹ️ [5/6] 无需发布新版本（无符合规则的提交）"
             echo "new_release_published=false" >> $GITHUB_OUTPUT
             echo "new_release_version=" >> $GITHUB_OUTPUT
             echo "current_tag=" >> $GITHUB_OUTPUT
@@ -92,12 +106,15 @@ jobs:
           # 强制返回原始 exit code，确保 CI 正确反映发布失败
           exit $EXIT_CODE
 
-      - name: 🐞 5. 调试输出
+      - name: 🐞 6. 调试输出
         if: always()
         run: |
-          echo "✅ ==== LOG === ✅"
-          echo "👉 需要发布 : ${{ steps.release.outputs.new_release_published }}"
-          echo "👉 当前版本: ${{ steps.release.outputs.new_release_version }}"
-          echo "👉 当前版本  Tag: ${{ steps.release.outputs.current_tag }}"
-          echo "👉 上个版本 Tag: ${{ steps.release.outputs.previous_tag }}"
-          echo "👉 日志预览: ${{ steps.release.outputs.changelog_preview }}"
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [6/6] 🐞 执行结果汇总"
+          echo "╚══════════════════════════════════════════╝"
+          echo "  👉 需要发布      : ${{ steps.release.outputs.new_release_published }}"
+          echo "  👉 当前版本      : ${{ steps.release.outputs.new_release_version }}"
+          echo "  👉 当前版本 Tag  : ${{ steps.release.outputs.current_tag }}"
+          echo "  👉 上个版本 Tag  : ${{ steps.release.outputs.previous_tag }}"
+          echo "  👉 日志预览      : ${{ steps.release.outputs.changelog_preview }}"
+          echo "══════════════════════════════════════════"

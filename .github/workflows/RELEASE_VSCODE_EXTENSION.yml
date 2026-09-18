@@ -27,11 +27,14 @@ jobs:
       - name: 🔍 1. 检查是否为 Tag 引用
         id: check_tag
         run: |
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [1/8] 🔍 检查触发引用"
+          echo "╚══════════════════════════════════════════╝"
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "✅ 触发自 Tag: ${{ github.ref }}"
+            echo "✅ [1/8] 触发自 Tag: ${{ github.ref }}"
             echo "is_tag=true" >> $GITHUB_OUTPUT
           else
-            echo "❌ 工作流未由 Tag 触发。当前引用为: ${{ github.ref }}"
+            echo "❌ [1/8] 工作流未由 Tag 触发。当前引用为: ${{ github.ref }}"
             echo "::error::此工作流仅允许在 Tag 上运行，而不是 Branch。请确保您手动触发时在 Use workflow from 选择了正确的 Tag 引用（例如：Tag 为 v1.2.3）。"
             echo "is_tag=false" >> $GITHUB_OUTPUT
           fi
@@ -44,37 +47,61 @@ jobs:
         if: steps.check_tag.outputs.is_tag == 'true'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 必须完整历史以支持 semantic-release 判断变更
+          fetch-depth: 1 # 打包发布无需完整历史
           persist-credentials: false # 拉取后不在磁盘上保留 GITHUB_TOKEN
 
-      - name: ⚙️ 4. 设置 Node.js 环境
+      - name: ⚙️ 4. 设置 pnpm
+        if: steps.check_tag.outputs.is_tag == 'true'
+        uses: pnpm/action-setup@v4
+        # 版本号自动读取 package.json 中的 packageManager 字段（pnpm@11.22.0）
+
+      - name: ⚙️ 5. 设置 Node.js 环境
+        if: steps.check_tag.outputs.is_tag == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm' # 适配 pnpm workspace：缓存 pnpm store（需先安装 pnpm）
 
-      - name: 📋 5. 获取版本号
+      - name: 📋 6. 获取版本号
         id: get_info
         run: |
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [6/8] 📋 获取插件信息"
+          echo "╚══════════════════════════════════════════╝"
           name=$(node -p "require('./package.json').name")
           version=$(node -p "require('./package.json').version")
           echo "name=$name" >> $GITHUB_OUTPUT
           echo "version=$version" >> $GITHUB_OUTPUT
-          echo "👉👉👉 插件名: $name"
-          echo "👉👉👉 版本号: $version"
-          echo "👉👉👉 ${{ github.ref_name }}"
+          echo "  👉 插件名  : $name"
+          echo "  👉 版本号  : $version"
+          echo "  👉 Tag     : ${{ github.ref_name }}"
+          echo "✅ [6/8] 插件信息获取完成"
 
-      - name: 📥 6. 安装依赖
-        run: npm ci
+      - name: 📥 7. 安装依赖
+        run: |
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [7/8] 📥 安装依赖（pnpm workspace）"
+          echo "╚══════════════════════════════════════════╝"
+          pnpm install --frozen-lockfile
+          echo "✅ [7/8] 依赖安装完成"
 
-      - name: 📦 7. 打包扩展
+      - name: 📦 8. 打包扩展
         id: package_extension
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: stub
-          dryRun: true
+        run: |
+          echo "╔══════════════════════════════════════════╗"
+          echo "  [8/8] 📦 打包 VSIX（typecheck → webview → esbuild）"
+          echo "╚══════════════════════════════════════════╝"
+          # vsce 会自动执行 vscode:prepublish（即 pnpm run package）
+          pnpm dlx @vscode/vsce package
+          VSIX_FILE="${{ steps.get_info.outputs.name }}-${{ steps.get_info.outputs.version }}.vsix"
+          if [[ ! -f "$VSIX_FILE" ]]; then
+            echo "::error::❌ [8/8] 未找到打包产物：$VSIX_FILE"
+            exit 1
+          fi
+          echo "vsixPath=${GITHUB_WORKSPACE}/${VSIX_FILE}" >> $GITHUB_OUTPUT
+          echo "✅ [8/8] 打包完成：${GITHUB_WORKSPACE}/${VSIX_FILE}"
 
-      - name: 🚀 8. 上传到 GitHub Releases
+      - name: 🚀 9. 上传到 GitHub Releases
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ github.token }}
@@ -83,14 +110,14 @@ jobs:
           overwrite: true
           tag: ${{ github.ref_name }}
 
-      - name: 🚀 9. 上传到 VSCode Marketplace
+      - name: 🚀 10. 上传到 VSCode Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
           extensionFile: ${{ steps.package_extension.outputs.vsixPath }}
 
-      - name: 🚀 10. 上传到 GitHub Artifact
+      - name: 🚀 11. 上传到 GitHub Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.get_info.outputs.name }}-${{ steps.get_info.outputs.version }}

@@ -1,0 +1,6 @@
+packages:
+  - .
+  - webview
+  - webview2
+allowBuilds:
+  esbuild: true

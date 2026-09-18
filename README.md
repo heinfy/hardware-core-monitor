@@ -1,69 +1,24 @@
-# 🖥️ Hardware Core Monitor
+# 硬核监控 (Hardware Core Monitor)
 
-**Real-time hardware monitoring puts your development environment in control**
+一款 VSCode 扩展，在编辑器内实时监控硬件状态和系统性能，无需切换工具即可查看 CPU、内存、磁盘、网络等信息。
 
-## 📋 Introduce
+## 功能
 
-> Real-time hardware monitoring and system performance tracking directly in VSCode
+- 实时监控：CPU 使用率、内存、磁盘读写速度、网络速度、CPU/GPU 温度
+- 硬件信息：处理器、内存、存储、显卡、电池状态
+- 多种展示：状态栏指标、侧边栏树形视图、Webview 仪表盘
+- 通知提醒：资源使用超过阈值时警告
+- 跨平台：支持 Windows、macOS、Linux（x86 / ARM）
 
-**Hardware Core Monitor** is a professional VSCode extension designed for developers who want to keep track of their computer's performance without leaving the editor. Whether you're debugging memory leaks, optimizing performance, or just curious about your system's health, Hardware Core Monitor provides accurate, real-time system information.
+支持自定义刷新频率、状态栏显示项和警告阈值，并自动适配 VSCode 亮色/暗色主题。
 
-## ✨ Core Features
+## 开发
 
-### 🔍 Real-time Monitoring
+本仓库使用 pnpm workspace 管理依赖。
 
-- **CPU Usage**: Real-time processor load and per-core utilization
-- **Memory Monitoring**: Track memory usage, swap space, and cache status
-- **Disk Activity**: Display read/write speeds and disk space usage
-- **Network Status**: Monitor upload/download speeds and connections
-- **Temperature Monitoring**: CPU and GPU temperatures (most hardware supported)
-
-### 🖥️ Hardware Information
-
-- **Processor Details**: Model, architecture, cores, frequency
-- **Memory Specifications**: Capacity, type, frequency
-- **Storage Devices**: Drive model, capacity, type (SSD/HDD)
-- **Graphics Card**: GPU model, VRAM capacity
-- **Battery Status**: Percentage, health, charging status (laptops)
-
-### 💻 System Information
-
-- **Operating System**: Version, kernel, architecture
-- **Uptime**: System running time
-- **Process Statistics**: Running processes and resource usage
-
-### 🎨 Multiple Display Modes
-
-- **Status Bar**: Key metrics in editor bottom bar
-- **Sidebar Panel**: Detailed tree view with categorized information
-- **Webview Dashboard**: Beautiful visual charts and progress bars
-- **Notifications**: Alerts when resource usage exceeds thresholds
-
-## 🚀 Use Cases
-
-- **Performance Optimization**: Monitor resources while coding to identify bottlenecks
-- **Debugging Assistance**: Troubleshoot memory leaks and high CPU usage
-- **Hardware Inspection**: Quick overview of device specifications and health
-- **Server Monitoring**: Keep track of remote development server status
-- **Battery Management**: Optimize battery usage for laptop users
-
-## ⚙️ Customization
-
-- **Refresh Rate**: Customizable update interval (1-10 seconds)
-- **Display Options**: Choose which metrics to show in status bar
-- **Threshold Settings**: Configure alert thresholds for resource usage
-- **Theme Adaptation**: Automatic light/dark theme support
-
-## 🛠️ Technical Features
-
-- **Low Resource Usage**: Optimized algorithms minimize performance impact
-- **Cross-Platform**: Full support for Windows, macOS, and Linux
-- **Multi-Architecture**: Compatible with x86 and ARM architectures
-- **Real-time Updates**: Live data refresh without manual intervention
-- **Error Handling**: Graceful exception handling and permission management
-
----
-
-## 🏷️ Tags
-
-`hardware monitor`, `system monitoring`, `performance analysis`, `resource management`, `cpu monitor`, `memory monitor`, `disk monitor`, `network monitor`, `temperature monitoring`, `developer tools`
+```bash
+pnpm install
+pnpm run compile
+pnpm run watch
+pnpm run package
+```

@@ -4,6 +4,7 @@ import { HardwareTreeProvider } from "./hardwareTreeProvider";
 import { MonitorService } from "./monitorService";
 import { StatusBarController } from "./statusBarController";
 import { ThresholdAlerter } from "./thresholdAlerter";
+import { Webview2Panel } from "./webview2Panel";
 
 /** 插件配置命名空间 */
 const CONFIG_SECTION = "hardwareCoreMonitor";
@@ -65,6 +66,14 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  // 打开带前端路由的第二个 Webview 窗口
+  const showWebview2 = vscode.commands.registerCommand(
+    "hardware-core-monitor.showWebview2",
+    () => {
+      Webview2Panel.createOrShow(context, monitorService);
+    },
+  );
+
   // 配置变化时动态调整刷新间隔
   const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
     (event) => {
@@ -83,6 +92,7 @@ export function activate(context: vscode.ExtensionContext): void {
     startMonitoring,
     stopMonitoring,
     showDashboard,
+    showWebview2,
     onDidChangeConfiguration,
   );
 

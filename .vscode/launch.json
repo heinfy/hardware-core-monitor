@@ -17,7 +17,8 @@
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}",
       "env": {
-        "WEBVIEW_DEV_SERVER_URL": "http://localhost:5173"
+        "WEBVIEW_DEV_SERVER_URL": "http://localhost:5173",
+        "WEBVIEW2_DEV_SERVER_URL": "http://localhost:5174"
       }
     },
     {

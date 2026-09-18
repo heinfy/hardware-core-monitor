@@ -2,8 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "watch",
+      "type": "shell",
       "isBackground": true,
       "problemMatcher": [],
       "presentation": {
@@ -13,11 +12,11 @@
         "kind": "build",
         "isDefault": true
       },
-      "label": "npm: watch"
+      "label": "pnpm: watch",
+      "command": "pnpm run watch"
     },
     {
-      "type": "npm",
-      "script": "watch:extension",
+      "type": "shell",
       "isBackground": true,
       "problemMatcher": {
         "owner": "esbuild",
@@ -32,27 +31,38 @@
           "endsPattern": "^\\[watch\\] build finished"
         }
       },
-      "label": "npm: watch:extension",
+      "label": "pnpm: watch:extension",
       "presentation": {
         "reveal": "never"
-      }
+      },
+      "command": "pnpm run watch:extension"
     },
     {
-      "type": "npm",
-      "script": "watch:webview",
+      "type": "shell",
       "isBackground": true,
       "problemMatcher": [],
-      "label": "npm: watch:webview",
+      "label": "pnpm: watch:webview",
+      "presentation": {
+        "reveal": "never"
+      },
+      "command": "pnpm run watch:webview"
+    },
+    {
+      "type": "shell",
+      "problemMatcher": "$tsc",
+      "label": "pnpm: compile",
+      "group": "build",
+      "command": "pnpm run compile"
+    },
+    {
+      "type": "shell",
+      "command": "pnpm run watch:webview2",
+      "isBackground": true,
+      "problemMatcher": [],
+      "label": "pnpm: watch:webview2",
       "presentation": {
         "reveal": "never"
       }
-    },
-    {
-      "type": "npm",
-      "script": "compile",
-      "problemMatcher": "$tsc",
-      "label": "npm: compile",
-      "group": "build"
     }
   ]
 }

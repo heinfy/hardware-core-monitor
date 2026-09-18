@@ -64,6 +64,11 @@
         "command": "hardware-core-monitor.showDashboard",
         "title": "Show Hardware Dashboard",
         "category": "Hardware Monitor"
+      },
+      {
+        "command": "hardware-core-monitor.showWebview2",
+        "title": "Show Webview2 (Routed Page)",
+        "category": "Hardware Monitor"
       }
     ],
     "menus": {
@@ -113,22 +118,26 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run build:webview && npm run typecheck && node esbuild.js",
-    "watch": "npm-run-all -p watch:extension watch:webview",
+    "vsix": "pnpm dlx @vscode/vsce package",
+    "vscode:prepublish": "pnpm run package",
+    "compile": "pnpm run build:webview && pnpm run build:webview2 && pnpm run typecheck && node esbuild.js",
+    "watch": "npm-run-all -p watch:extension watch:webview watch:webview2",
     "watch:extension": "node esbuild.js --watch",
-    "watch:webview": "npm --prefix webview run watch",
-    "dev:webview": "npm --prefix webview run dev",
+    "watch:webview": "pnpm --filter hardware-core-monitor-webview run watch",
+    "dev:webview": "pnpm --filter hardware-core-monitor-webview run dev",
     "build:extension": "node esbuild.js",
-    "build:webview": "npm --prefix webview run build",
-    "typecheck": "tsc --noEmit && npm --prefix webview run typecheck",
-    "package": "npm run typecheck && npm run build:webview && node esbuild.js --production",
+    "build:webview": "pnpm --filter hardware-core-monitor-webview run build",
+    "typecheck": "tsc --noEmit && pnpm --filter hardware-core-monitor-webview run typecheck && pnpm --filter hardware-core-monitor-webview2 run typecheck",
+    "package": "pnpm run typecheck && pnpm run build:webview && pnpm run build:webview2 && node esbuild.js --production",
     "lint": "eslint src",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile",
+    "pretest": "pnpm run compile-tests && pnpm run compile",
     "test": "vscode-test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build:webview2": "pnpm --filter hardware-core-monitor-webview2 run build",
+    "dev:webview2": "pnpm --filter hardware-core-monitor-webview2 run dev",
+    "watch:webview2": "pnpm --filter hardware-core-monitor-webview2 run watch"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
@@ -168,5 +177,6 @@
     "prettier": "^3.6.2",
     "semantic-release": "^24.2.7",
     "typescript": "^5.9.2"
-  }
+  },
+  "packageManager": "pnpm@11.22.0"
 }

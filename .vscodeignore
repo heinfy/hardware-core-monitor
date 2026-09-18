@@ -5,6 +5,7 @@
 .husky/**
 src/**
 webview/**
+webview2/**
 out/**/*.map
 dist/**/*.map
 **/*.map
@@ -15,8 +16,10 @@ dist/**/*.map
 esbuild.js
 commitlint.config.js
 .releaserc.json
-node_modules/.cache/**
-node_modules/.package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+node_modules/**
+!node_modules/systeminformation/**
 
-# 注意：out/extension.js、dist/webview 与 node_modules/systeminformation
-# 是运行时必需内容，不能被忽略。
+# 注意：out/extension.js、dist/webview、dist/webview2 与
+# node_modules/systeminformation 是运行时必需内容，不能被忽略。
