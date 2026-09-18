@@ -111,11 +111,11 @@ jobs:
           tag: ${{ github.ref_name }}
 
       - name: 🚀 10. 上传到 VSCode Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ steps.package_extension.outputs.vsixPath }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+        run: |
+          pnpm dlx @vscode/vsce publish \
+            --packagePath "${{ steps.package_extension.outputs.vsixPath }}"
 
       - name: 🚀 11. 上传到 GitHub Artifact
         uses: actions/upload-artifact@v4
