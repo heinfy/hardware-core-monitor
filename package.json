@@ -4,6 +4,7 @@
   "description": "Real-time hardware monitoring and system performance tracking directly in VSCode",
   "version": "1.0.7",
   "publisher": "HouFei",
+  "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
