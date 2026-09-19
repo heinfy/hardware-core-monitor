@@ -1,3 +1,9 @@
+## [1.0.9](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.8...v1.0.9) (2026-09-19)
+
+### Bug Fixes
+
+- Update activitybar.svg ([eb0d4be](https://github.com/heinfy/hardware-core-monitor/commit/eb0d4bed74d4bc0dab7d7a9f21cb04255ccfea9a))
+
 ## [1.0.8](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.7...v1.0.8) (2026-09-19)
 
 ### Bug Fixes
