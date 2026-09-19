@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { text } from "./i18n";
 import type { MonitorSnapshot } from "./shared/protocol";
 
 /** 告警冷却时间：避免每个刷新周期都弹出一次警告 */
@@ -28,14 +29,17 @@ export class ThresholdAlerter implements vscode.Disposable {
     if (snapshot.cpu.usage > cpuThreshold) {
       this.alert(
         "cpu",
-        `CPU 使用率过高：${snapshot.cpu.usage.toFixed(1)}%（阈值 ${cpuThreshold}%）`,
+        text.alert.highCpuUsage(snapshot.cpu.usage.toFixed(1), cpuThreshold),
       );
     }
 
     if (snapshot.memory.usage > memoryThreshold) {
       this.alert(
         "memory",
-        `内存使用率过高：${snapshot.memory.usage.toFixed(1)}%（阈值 ${memoryThreshold}%）`,
+        text.alert.highMemoryUsage(
+          snapshot.memory.usage.toFixed(1),
+          memoryThreshold,
+        ),
       );
     }
 
@@ -45,7 +49,10 @@ export class ThresholdAlerter implements vscode.Disposable {
     ) {
       this.alert(
         "temperature",
-        `CPU 温度过高：${snapshot.temperature.toFixed(1)}℃（阈值 ${temperatureThreshold}℃）`,
+        text.alert.highCpuTemperature(
+          snapshot.temperature.toFixed(1),
+          temperatureThreshold,
+        ),
       );
     }
   }

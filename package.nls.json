@@ -1,0 +1,19 @@
+{
+  "extension.displayName": "Hardware Core Monitor",
+  "extension.description": "Real-time hardware monitoring and system performance tracking directly in VS Code",
+  "viewContainer.title": "Hardware Monitor",
+  "view.name": "Hardware Monitor",
+  "view.welcome": "No hardware data available. [Start Monitoring](command:hardware-core-monitor.startMonitoring)",
+  "command.category": "Hardware Monitor",
+  "command.start.title": "Start Hardware Monitoring",
+  "command.stop.title": "Stop Hardware Monitoring",
+  "command.refresh.title": "Refresh Hardware Data",
+  "command.dashboard.title": "Open Hardware Dashboard",
+  "command.webview2.title": "Open Webview2 (Routed Page)",
+  "configuration.title": "Hardware Core Monitor",
+  "configuration.refreshInterval.description": "Refresh interval in milliseconds",
+  "configuration.enabledOnStartup.description": "Start monitoring automatically when VS Code starts",
+  "configuration.cpuThreshold.description": "CPU usage warning threshold (%)",
+  "configuration.memoryThreshold.description": "Memory usage warning threshold (%)",
+  "configuration.temperatureThreshold.description": "Temperature warning threshold (°C)"
+}

@@ -4,6 +4,7 @@ import type {
   MonitorSnapshot,
   WebviewToHostMessage,
 } from "./shared/protocol";
+import { text } from "./i18n";
 import type { MonitorService } from "./monitorService";
 
 /** Webview2 面板视图类型，与 DashboardPanel 完全独立 */
@@ -82,7 +83,7 @@ export class Webview2Panel implements vscode.Disposable {
 
     const panel = vscode.window.createWebviewPanel(
       Webview2ViewType,
-      "Hardware Monitor (Webview2)",
+      text.panel.webview2Title(),
       column ?? vscode.ViewColumn.Active,
       {
         enableScripts: true,

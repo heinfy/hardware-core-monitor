@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { DashboardPanel } from "./dashboardPanel";
 import { HardwareTreeProvider } from "./hardwareTreeProvider";
+import { text } from "./i18n";
 import { MonitorService } from "./monitorService";
 import { StatusBarController } from "./statusBarController";
 import { ThresholdAlerter } from "./thresholdAlerter";
@@ -11,6 +12,9 @@ const CONFIG_SECTION = "hardwareCoreMonitor";
 
 /** 默认刷新间隔（毫秒） */
 const DEFAULT_REFRESH_INTERVAL = 2000;
+
+/** 控制活动栏标题按钮显示状态的上下文键 */
+const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
 
 /**
  * 插件入口。
@@ -47,7 +51,12 @@ export function activate(context: vscode.ExtensionContext): void {
     "hardware-core-monitor.startMonitoring",
     () => {
       monitorService.start();
-      void vscode.window.showInformationMessage("硬件监控已开始");
+      void vscode.commands.executeCommand(
+        "setContext",
+        MONITORING_CONTEXT,
+        true,
+      );
+      void vscode.window.showInformationMessage(text.monitor.started());
     },
   );
 
@@ -55,7 +64,19 @@ export function activate(context: vscode.ExtensionContext): void {
     "hardware-core-monitor.stopMonitoring",
     () => {
       monitorService.stop();
-      void vscode.window.showInformationMessage("硬件监控已暂停");
+      void vscode.commands.executeCommand(
+        "setContext",
+        MONITORING_CONTEXT,
+        false,
+      );
+      void vscode.window.showInformationMessage(text.monitor.paused());
+    },
+  );
+
+  const refreshMonitoring = vscode.commands.registerCommand(
+    "hardware-core-monitor.refreshMonitoring",
+    () => {
+      monitorService.requestNow();
     },
   );
 
@@ -91,13 +112,21 @@ export function activate(context: vscode.ExtensionContext): void {
     alerter,
     startMonitoring,
     stopMonitoring,
+    refreshMonitoring,
     showDashboard,
     showWebview2,
     onDidChangeConfiguration,
   );
 
   // 按用户配置决定是否在激活后自动开始监控
-  if (getEnabledOnStartup()) {
+  const enabledOnStartup = getEnabledOnStartup();
+  void vscode.commands.executeCommand(
+    "setContext",
+    MONITORING_CONTEXT,
+    enabledOnStartup,
+  );
+
+  if (enabledOnStartup) {
     monitorService.start();
   }
 }

@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { text } from "./i18n";
 import type { MonitorSnapshot } from "./shared/protocol";
 
 /**
@@ -17,9 +18,9 @@ export class StatusBarController implements vscode.Disposable {
 
     // 点击状态栏打开 React 仪表盘
     this.item.command = "hardware-core-monitor.showDashboard";
-    this.item.name = "Hardware Core Monitor";
+    this.item.name = text.statusBar.name();
     this.item.text = "$(pulse) CPU --% | RAM --%";
-    this.item.tooltip = "Hardware Core Monitor（点击打开仪表盘）";
+    this.item.tooltip = text.statusBar.tooltip();
   }
 
   /** 根据最新快照更新状态栏内容 */
@@ -27,13 +28,13 @@ export class StatusBarController implements vscode.Disposable {
     this.item.text = `$(pulse) CPU ${snapshot.cpu.usage.toFixed(0)}% | RAM ${snapshot.memory.usage.toFixed(0)}%`;
     this.item.tooltip = new vscode.MarkdownString(
       [
-        `CPU：${snapshot.cpu.usage.toFixed(1)}%`,
-        `内存：${snapshot.memory.usage.toFixed(1)}%`,
+        text.statusBar.cpuUsage(snapshot.cpu.usage.toFixed(1)),
+        text.statusBar.memoryUsage(snapshot.memory.usage.toFixed(1)),
         snapshot.temperature !== null
-          ? `温度：${snapshot.temperature.toFixed(1)}℃`
-          : "温度：不可用",
+          ? text.statusBar.temperature(snapshot.temperature.toFixed(1))
+          : text.statusBar.temperatureUnavailable(),
         "",
-        "点击打开完整仪表盘",
+        text.statusBar.openDashboard(),
       ].join("\n"),
     );
     this.item.show();

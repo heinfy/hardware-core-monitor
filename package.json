@@ -1,7 +1,7 @@
 {
   "name": "hardware-core-monitor",
-  "displayName": "Hardware Core Monitor",
-  "description": "Real-time hardware monitoring and system performance tracking directly in VSCode",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
   "version": "1.0.9",
   "publisher": "HouFei",
   "icon": "resources/icon.png",
@@ -23,21 +23,22 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "hardware-core-monitor",
-          "title": "Hardware Monitor",
+          "title": "%viewContainer.title%",
           "icon": "resources/activitybar.svg"
         }
       ]
     },
     "views": {
-      "explorer": [
+      "hardware-core-monitor": [
         {
           "id": "hardware-core-monitor.sidebarView",
-          "name": "Hardware Monitor",
+          "name": "%view.name%",
           "icon": "resources/activitybar.svg",
           "when": "true"
         }
@@ -46,74 +47,87 @@
     "viewsWelcome": [
       {
         "view": "hardware-core-monitor.sidebarView",
-        "contents": "No hardware data available. [Start Monitoring](command:hardware-core-monitor.startMonitoring)",
+        "contents": "%view.welcome%",
         "when": "!hardwareMonitorHasData"
       }
     ],
     "commands": [
       {
         "command": "hardware-core-monitor.startMonitoring",
-        "title": "Start Hardware Monitoring",
-        "category": "Hardware Monitor"
+        "title": "%command.start.title%",
+        "category": "%command.category%",
+        "icon": "$(play)"
       },
       {
         "command": "hardware-core-monitor.stopMonitoring",
-        "title": "Stop Hardware Monitoring",
-        "category": "Hardware Monitor"
+        "title": "%command.stop.title%",
+        "category": "%command.category%",
+        "icon": "$(debug-pause)"
+      },
+      {
+        "command": "hardware-core-monitor.refreshMonitoring",
+        "title": "%command.refresh.title%",
+        "category": "%command.category%",
+        "icon": "$(refresh)"
       },
       {
         "command": "hardware-core-monitor.showDashboard",
-        "title": "Show Hardware Dashboard",
-        "category": "Hardware Monitor"
+        "title": "%command.dashboard.title%",
+        "category": "%command.category%"
       },
       {
         "command": "hardware-core-monitor.showWebview2",
-        "title": "Show Webview2 (Routed Page)",
-        "category": "Hardware Monitor"
+        "title": "%command.webview2.title%",
+        "category": "%command.category%"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "hardware-core-monitor.startMonitoring",
+          "command": "hardware-core-monitor.refreshMonitoring",
           "when": "view == hardware-core-monitor.sidebarView",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "hardware-core-monitor.startMonitoring",
+          "when": "view == hardware-core-monitor.sidebarView && !hardwareMonitorIsRunning",
+          "group": "navigation@2"
         },
         {
           "command": "hardware-core-monitor.stopMonitoring",
-          "when": "view == hardware-core-monitor.sidebarView",
-          "group": "navigation"
+          "when": "view == hardware-core-monitor.sidebarView && hardwareMonitorIsRunning",
+          "group": "navigation@2"
         }
       ]
     },
     "configuration": {
-      "title": "Hardware Core Monitor",
+      "title": "%configuration.title%",
       "properties": {
         "hardwareCoreMonitor.refreshInterval": {
           "type": "number",
           "default": 2000,
           "minimum": 500,
-          "description": "Refresh interval in milliseconds"
+          "description": "%configuration.refreshInterval.description%"
         },
         "hardwareCoreMonitor.enabledOnStartup": {
           "type": "boolean",
           "default": true,
-          "description": "Start monitoring automatically when VSCode starts"
+          "description": "%configuration.enabledOnStartup.description%"
         },
         "hardwareCoreMonitor.cpuThreshold": {
           "type": "number",
           "default": 80,
-          "description": "CPU usage warning threshold (%)"
+          "description": "%configuration.cpuThreshold.description%"
         },
         "hardwareCoreMonitor.memoryThreshold": {
           "type": "number",
           "default": 85,
-          "description": "Memory usage warning threshold (%)"
+          "description": "%configuration.memoryThreshold.description%"
         },
         "hardwareCoreMonitor.temperatureThreshold": {
           "type": "number",
           "default": 80,
-          "description": "Temperature warning threshold (°C)"
+          "description": "%configuration.temperatureThreshold.description%"
         }
       }
     }
@@ -129,6 +143,7 @@
     "build:extension": "node esbuild.js",
     "build:webview": "pnpm --filter hardware-core-monitor-webview run build",
     "typecheck": "tsc --noEmit && pnpm --filter hardware-core-monitor-webview run typecheck && pnpm --filter hardware-core-monitor-webview2 run typecheck",
+    "l10n:export": "vscode-l10n-dev export --outDir ./l10n ./src",
     "package": "pnpm run typecheck && pnpm run build:webview && pnpm run build:webview2 && node esbuild.js --production",
     "lint": "eslint src",
     "compile-tests": "tsc -p . --outDir out",
@@ -166,6 +181,7 @@
     "@types/vscode": "^1.138.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
+    "@vscode/l10n-dev": "^0.0.35",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.25.8",

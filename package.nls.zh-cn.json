@@ -1,0 +1,19 @@
+{
+  "extension.displayName": "硬件核心监控",
+  "extension.description": "直接在 VS Code 中实时监控硬件状态和系统性能",
+  "viewContainer.title": "硬件监控",
+  "view.name": "硬件监控",
+  "view.welcome": "暂无硬件数据。[开始监控](command:hardware-core-monitor.startMonitoring)",
+  "command.category": "硬件监控",
+  "command.start.title": "开始硬件监控",
+  "command.stop.title": "停止硬件监控",
+  "command.refresh.title": "刷新硬件数据",
+  "command.dashboard.title": "打开硬件仪表盘",
+  "command.webview2.title": "打开 Webview2（路由页面）",
+  "configuration.title": "硬件核心监控",
+  "configuration.refreshInterval.description": "刷新间隔（毫秒）",
+  "configuration.enabledOnStartup.description": "VS Code 启动时自动开始监控",
+  "configuration.cpuThreshold.description": "CPU 使用率告警阈值（%）",
+  "configuration.memoryThreshold.description": "内存使用率告警阈值（%）",
+  "configuration.temperatureThreshold.description": "温度告警阈值（°C）"
+}

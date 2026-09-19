@@ -4,6 +4,7 @@ import type {
   MonitorSnapshot,
   WebviewToHostMessage,
 } from "./shared/protocol";
+import { text } from "./i18n";
 import type { MonitorService } from "./monitorService";
 
 /** React Webview 的面板视图类型 */
@@ -84,7 +85,7 @@ export class DashboardPanel implements vscode.Disposable {
 
     const panel = vscode.window.createWebviewPanel(
       DashboardViewType,
-      "Hardware Dashboard",
+      text.panel.dashboardTitle(),
       column ?? vscode.ViewColumn.One,
       {
         enableScripts: true,
