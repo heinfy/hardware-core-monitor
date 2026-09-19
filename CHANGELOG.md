@@ -1,3 +1,9 @@
+## [1.0.10](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.9...v1.0.10) (2026-09-19)
+
+### Bug Fixes
+
+- **i18n:** implement localization for user-facing messages ([e106ab1](https://github.com/heinfy/hardware-core-monitor/commit/e106ab1a7108dc0ac540e2b536ffdd670f31d9da))
+
 ## [1.0.9](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.8...v1.0.9) (2026-09-19)
 
 ### Bug Fixes
