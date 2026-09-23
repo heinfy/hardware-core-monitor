@@ -103,17 +103,6 @@
     "configuration": {
       "title": "%configuration.title%",
       "properties": {
-        "hardwareCoreMonitor.refreshInterval": {
-          "type": "number",
-          "default": 2000,
-          "minimum": 500,
-          "description": "%configuration.refreshInterval.description%"
-        },
-        "hardwareCoreMonitor.enabledOnStartup": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.enabledOnStartup.description%"
-        },
         "hardwareCoreMonitor.cpuThreshold": {
           "type": "number",
           "default": 80,
@@ -123,11 +112,6 @@
           "type": "number",
           "default": 85,
           "description": "%configuration.memoryThreshold.description%"
-        },
-        "hardwareCoreMonitor.temperatureThreshold": {
-          "type": "number",
-          "default": 80,
-          "description": "%configuration.temperatureThreshold.description%"
         }
       }
     }

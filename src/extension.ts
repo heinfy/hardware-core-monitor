@@ -7,11 +7,8 @@ import { StatusBarController } from "./statusBarController";
 import { ThresholdAlerter } from "./thresholdAlerter";
 import { Webview2Panel } from "./webview2Panel";
 
-/** 插件配置命名空间 */
-const CONFIG_SECTION = "hardwareCoreMonitor";
-
-/** 默认刷新间隔（毫秒） */
-const DEFAULT_REFRESH_INTERVAL = 2000;
+/** 侧栏打开时的监控刷新间隔（毫秒） */
+const SIDEBAR_REFRESH_INTERVAL = 10_000;
 
 /** 控制活动栏标题按钮显示状态的上下文键 */
 const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
@@ -23,10 +20,8 @@ const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
  * 分发给 TreeView、StatusBar、阈值告警和 React 仪表盘。
  */
 export function activate(context: vscode.ExtensionContext): void {
-  const interval = getRefreshInterval();
-
   // 唯一的数据源：所有 UI 都订阅它
-  const monitorService = new MonitorService(interval);
+  const monitorService = new MonitorService(SIDEBAR_REFRESH_INTERVAL);
   const treeProvider = new HardwareTreeProvider();
   const statusBar = new StatusBarController();
   const alerter = new ThresholdAlerter();
@@ -47,9 +42,42 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions,
   );
 
+  /** 根据侧栏可见性自动启停监控 */
+  const syncMonitoringWithSidebarVisibility = (visible: boolean): void => {
+    if (visible) {
+      monitorService.updateInterval(SIDEBAR_REFRESH_INTERVAL);
+      monitorService.start();
+      void vscode.commands.executeCommand(
+        "setContext",
+        MONITORING_CONTEXT,
+        true,
+      );
+      return;
+    }
+
+    monitorService.stop();
+    void vscode.commands.executeCommand(
+      "setContext",
+      MONITORING_CONTEXT,
+      false,
+    );
+  };
+
+  treeView.onDidChangeVisibility(
+    (event) => syncMonitoringWithSidebarVisibility(event.visible),
+    undefined,
+    context.subscriptions,
+  );
+
+  // 扩展激活时若侧栏已处于打开状态，立即开始监控
+  if (treeView.visible) {
+    syncMonitoringWithSidebarVisibility(true);
+  }
+
   const startMonitoring = vscode.commands.registerCommand(
     "hardware-core-monitor.startMonitoring",
     () => {
+      monitorService.updateInterval(SIDEBAR_REFRESH_INTERVAL);
       monitorService.start();
       void vscode.commands.executeCommand(
         "setContext",
@@ -95,15 +123,6 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
-  // 配置变化时动态调整刷新间隔
-  const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
-    (event) => {
-      if (event.affectsConfiguration(CONFIG_SECTION)) {
-        monitorService.updateInterval(getRefreshInterval());
-      }
-    },
-  );
-
   // VSCode 会统一清理这些资源
   context.subscriptions.push(
     monitorService,
@@ -115,36 +134,10 @@ export function activate(context: vscode.ExtensionContext): void {
     refreshMonitoring,
     showDashboard,
     showWebview2,
-    onDidChangeConfiguration,
   );
-
-  // 按用户配置决定是否在激活后自动开始监控
-  const enabledOnStartup = getEnabledOnStartup();
-  void vscode.commands.executeCommand(
-    "setContext",
-    MONITORING_CONTEXT,
-    enabledOnStartup,
-  );
-
-  if (enabledOnStartup) {
-    monitorService.start();
-  }
 }
 
 export function deactivate(): void {
   // 清理逻辑由 context.subscriptions 统一处理，这里不需要额外工作
 }
 
-/** 读取“启动时自动监控”配置 */
-function getEnabledOnStartup(): boolean {
-  return vscode.workspace
-    .getConfiguration(CONFIG_SECTION)
-    .get<boolean>("enabledOnStartup", true);
-}
-
-/** 读取用户配置的刷新间隔 */
-function getRefreshInterval(): number {
-  return vscode.workspace
-    .getConfiguration(CONFIG_SECTION)
-    .get<number>("refreshInterval", DEFAULT_REFRESH_INTERVAL);
-}

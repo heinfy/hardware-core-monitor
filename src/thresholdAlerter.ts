@@ -6,7 +6,7 @@ import type { MonitorSnapshot } from "./shared/protocol";
 const ALERT_COOLDOWN_MS = 60_000;
 
 /** 需要检查的告警类型 */
-type AlertKind = "cpu" | "memory" | "temperature";
+type AlertKind = "cpu" | "memory";
 
 /**
  * 阈值告警器。
@@ -24,7 +24,6 @@ export class ThresholdAlerter implements vscode.Disposable {
 
     const cpuThreshold = config.get<number>("cpuThreshold", 80);
     const memoryThreshold = config.get<number>("memoryThreshold", 85);
-    const temperatureThreshold = config.get<number>("temperatureThreshold", 80);
 
     if (snapshot.cpu.usage > cpuThreshold) {
       this.alert(
@@ -39,19 +38,6 @@ export class ThresholdAlerter implements vscode.Disposable {
         text.alert.highMemoryUsage(
           snapshot.memory.usage.toFixed(1),
           memoryThreshold,
-        ),
-      );
-    }
-
-    if (
-      snapshot.temperature !== null &&
-      snapshot.temperature > temperatureThreshold
-    ) {
-      this.alert(
-        "temperature",
-        text.alert.highCpuTemperature(
-          snapshot.temperature.toFixed(1),
-          temperatureThreshold,
         ),
       );
     }

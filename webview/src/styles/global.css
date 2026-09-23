@@ -1,6 +1,22 @@
 /* 使用 VSCode 主题变量，保证亮暗主题下观感一致 */
 :root {
   color-scheme: light dark;
+  --geek-accent: var(--vscode-textLink-foreground, #4fc3f7);
+  --geek-grid: color-mix(
+    in srgb,
+    var(--vscode-descriptionForeground) 10%,
+    transparent
+  );
+  --card-border: color-mix(
+    in srgb,
+    var(--vscode-panel-border, #808080) 55%,
+    transparent
+  );
+  --card-surface: color-mix(
+    in srgb,
+    var(--vscode-editorWidget-background) 88%,
+    transparent
+  );
 }
 
 * {
@@ -9,76 +25,225 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: var(--vscode-font-family);
   font-size: var(--vscode-font-size);
   color: var(--vscode-editor-foreground);
   background-color: var(--vscode-editor-background);
+  /* 极客风格网格背景 */
+  background-image:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--geek-accent) 12%, transparent),
+      transparent 42%
+    ),
+    linear-gradient(var(--geek-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--geek-grid) 1px, transparent 1px);
+  background-size:
+    auto,
+    24px 24px,
+    24px 24px;
+  background-attachment: fixed;
 }
 
 .page {
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 20px 28px;
 }
 
 .toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--geek-accent) 8%, var(--card-surface)),
+    var(--card-surface)
+  );
+  backdrop-filter: blur(6px);
 }
 
-.toolbar h1 {
+.toolbar-title h1 {
+  margin: 4px 0 6px;
+  font-size: 1.45rem;
+  letter-spacing: 0.02em;
+}
+
+.toolbar-kicker {
   margin: 0;
-  font-size: 1.4rem;
+  font-family: var(
+    --vscode-editor-font-family,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--geek-accent);
 }
 
 .updated-at {
   color: var(--vscode-descriptionForeground);
+  font-size: 0.88rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 button {
-  padding: 6px 14px;
+  padding: 7px 14px;
   border: 1px solid var(--vscode-button-border, transparent);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--vscode-button-foreground);
   background-color: var(--vscode-button-background);
   cursor: pointer;
   font-family: inherit;
+  font-size: 0.9rem;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 button:hover {
   background-color: var(--vscode-button-hoverBackground);
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  color: var(--vscode-foreground);
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-editor-background) 70%,
+    var(--vscode-button-background)
+  );
+  border-color: var(--card-border);
+}
+
+.btn-secondary:hover {
+  border-color: color-mix(in srgb, var(--geek-accent) 45%, var(--card-border));
+  background-color: color-mix(
+    in srgb,
+    var(--geek-accent) 10%,
+    var(--vscode-editor-background)
+  );
+}
+
+.action-toast {
+  margin: -6px 0 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  animation: toast-in 0.25s ease;
+}
+
+.toast-success {
+  color: var(--vscode-foreground);
+  border: 1px solid color-mix(in srgb, var(--geek-accent) 35%, transparent);
+  background-color: color-mix(in srgb, var(--geek-accent) 12%, transparent);
+}
+
+.toast-error {
+  color: var(--vscode-editorError-foreground);
+  border: 1px solid var(--vscode-inputValidation-errorBorder);
+  background-color: color-mix(
+    in srgb,
+    var(--vscode-editorError-foreground) 10%,
+    transparent
+  );
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   gap: 16px;
 }
 
 .card {
-  padding: 16px;
-  border: 1px solid var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
-  border-radius: 8px;
-  background-color: var(--vscode-editorWidget-background);
+  position: relative;
+  overflow: hidden;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--geek-accent) 4%, var(--card-surface)),
+    var(--card-surface)
+  );
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 8%, transparent);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.span-2 {
-  grid-column: span 2;
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--geek-accent) 70%, transparent),
+    transparent
+  );
+  opacity: 0.75;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--geek-accent) 35%, var(--card-border));
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px color-mix(in srgb, #000 12%, transparent);
+}
+
+.span-full {
+  grid-column: 1 / -1;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
 .card h2 {
   margin: 0 0 12px;
-  font-size: 1rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--vscode-foreground);
 }
 
@@ -87,9 +252,19 @@ button:hover {
 }
 
 .badge {
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-family: var(
+    --vscode-editor-font-family,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 .badge-normal {
@@ -130,12 +305,20 @@ button:hover {
   height: 100%;
   min-width: 2px;
   border-radius: 999px;
-  background-color: var(--vscode-charts-blue);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--geek-accent) 80%, var(--vscode-charts-blue)),
+    var(--vscode-charts-blue)
+  );
   transition: width 0.3s ease;
 }
 
 .progress-fill.warning {
-  background-color: var(--vscode-charts-red);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--vscode-charts-red) 80%, #ff8a65),
+    var(--vscode-charts-red)
+  );
 }
 
 .core-grid {
@@ -181,13 +364,44 @@ button:hover {
 
 .network-speed {
   display: inline-flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
   color: var(--vscode-descriptionForeground);
+  font-family: var(
+    --vscode-editor-font-family,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  font-size: 0.82rem;
 }
 
 .disk-item {
   display: grid;
   gap: 6px;
+}
+
+.disk-io-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.9rem;
+}
+
+.gpu-item {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.kv-list.compact {
+  gap: 6px;
+  font-size: 0.85rem;
 }
 
 .kv-list {
@@ -200,6 +414,12 @@ button:hover {
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  padding: 2px 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--card-border) 80%, transparent);
+}
+
+.kv-list div:last-child {
+  border-bottom: none;
 }
 
 .kv-list dt {
@@ -209,10 +429,33 @@ button:hover {
 .kv-list dd {
   margin: 0;
   text-align: right;
+  font-family: var(
+    --vscode-editor-font-family,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  font-size: 0.86em;
 }
 
 .muted {
   color: var(--vscode-descriptionForeground);
+}
+
+.hardware-meta {
+  margin: 4px 0 0;
+  font-size: 0.85em;
+}
+
+.physical-disks {
+  margin-bottom: 12px;
+}
+
+.physical-disk-item .hardware-meta {
+  margin-top: 4px;
 }
 
 .loading {
@@ -224,7 +467,7 @@ button:hover {
 .error-box {
   padding: 20px;
   border: 1px solid var(--vscode-inputValidation-errorBorder);
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: color-mix(
     in srgb,
     var(--vscode-editorError-foreground) 10%,
@@ -236,12 +479,82 @@ button:hover {
   margin-top: 0;
 }
 
+.page-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--card-border);
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.85rem;
+}
+
+.footer-label {
+  font-family: var(
+    --vscode-editor-font-family,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.footer-link {
+  padding: 0;
+  border: none;
+  color: var(--geek-accent);
+  background: transparent;
+  text-decoration: none;
+  word-break: break-all;
+  font-size: inherit;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  background: transparent;
+}
+
 @media (max-width: 720px) {
+  .page {
+    padding: 16px 14px 22px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .toolbar-actions button {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 120px;
+  }
+
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
-  .span-2 {
+  .span-full {
     grid-column: auto;
+  }
+}
+
+@media (min-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .span-full {
+    grid-column: 1 / -1;
   }
 }

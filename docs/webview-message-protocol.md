@@ -88,7 +88,6 @@ export type HostToWebviewMessage =
 - `memory`：总内存、已用内存、空闲内存和使用率
 - `disks`：磁盘挂载点、容量、已用空间和使用率
 - `network`：网卡名称、每秒接收/发送字节数
-- `temperature`：CPU 主温度，不可用时为 `null`
 - `system`：平台、发行版、内核、主机名、架构、CPU 型号等静态信息
 - `battery`：电池信息，无电池时为 `null`
 

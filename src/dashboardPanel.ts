@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import * as vscode from "vscode";
 import type {
   HostToWebviewMessage,
@@ -35,14 +36,26 @@ export class DashboardPanel implements vscode.Disposable {
     // 处理来自 React 页面的消息
     panel.webview.onDidReceiveMessage(
       (message: WebviewToHostMessage) => {
-        if (message.type === "ready" || message.type === "refresh") {
-          // 页面加载完成或用户手动刷新时，立即采集一次
-          this.monitorService.requestNow();
+        switch (message.type) {
+          case "ready":
+          case "refresh":
+            // 页面加载完成或用户手动刷新时，立即采集一次
+            this.monitorService.requestNow();
 
-          // 如果已有缓存快照，先补发，避免页面空白等待
-          if (this.monitorService.latestSnapshot) {
-            void this.postSnapshot(this.monitorService.latestSnapshot);
-          }
+            // 如果已有缓存快照，先补发，避免页面空白等待
+            if (this.monitorService.latestSnapshot) {
+              void this.postSnapshot(this.monitorService.latestSnapshot);
+            }
+            break;
+          case "copyReport":
+            void this.copyReport(message.content);
+            break;
+          case "exportReport":
+            void this.exportReport(message.content, message.fileName);
+            break;
+          case "openExternal":
+            void vscode.env.openExternal(vscode.Uri.parse(message.url));
+            break;
         }
       },
       this,
@@ -110,6 +123,57 @@ export class DashboardPanel implements vscode.Disposable {
     await this.panel.webview.postMessage({
       type: "snapshot",
       snapshot,
+    } satisfies HostToWebviewMessage);
+  }
+
+  /** 将硬件报告复制到系统剪贴板 */
+  private async copyReport(content: string): Promise<void> {
+    try {
+      await vscode.env.clipboard.writeText(content);
+      await this.postActionResult(true, "已复制到剪贴板");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "复制失败，请稍后重试";
+      await this.postActionResult(false, message);
+    }
+  }
+
+  /** 将硬件报告导出为 txt 文件 */
+  private async exportReport(
+    content: string,
+    fileName: string,
+  ): Promise<void> {
+    try {
+      const targetUri = await vscode.window.showSaveDialog({
+        defaultUri: vscode.Uri.file(fileName),
+        filters: {
+          "Text Files": ["txt"],
+        },
+        saveLabel: "导出",
+      });
+
+      if (!targetUri) {
+        return;
+      }
+
+      await writeFile(targetUri.fsPath, content, "utf8");
+      await this.postActionResult(true, "报告已导出");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "导出失败，请稍后重试";
+      await this.postActionResult(false, message);
+    }
+  }
+
+  /** 向 Webview 发送操作结果反馈 */
+  private async postActionResult(
+    success: boolean,
+    message: string,
+  ): Promise<void> {
+    await this.panel.webview.postMessage({
+      type: "actionResult",
+      success,
+      message,
     } satisfies HostToWebviewMessage);
   }
 

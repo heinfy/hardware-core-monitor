@@ -26,11 +26,36 @@ export function HomePage() {
             <dd>{snapshot.memory.usage.toFixed(1)}%</dd>
           </div>
           <div className="metric-row">
-            <dt>CPU 温度</dt>
+            <dt>GPU</dt>
             <dd>
-              {snapshot.temperature === null
-                ? "不支持"
-                : `${snapshot.temperature} ℃`}
+              {snapshot.gpus.length === 0
+                ? "不可用"
+                : snapshot.gpus
+                    .map((gpu) => `${gpu.vendor} ${gpu.model}`)
+                    .join(" / ")}
+            </dd>
+          </div>
+          <div className="metric-row">
+            <dt>系统盘</dt>
+            <dd>
+              {snapshot.systemDisk
+                ? `${snapshot.systemDisk.usage.toFixed(1)}% · ${(snapshot.systemDisk.total / 1024 ** 3).toFixed(1)} GB`
+                : "不可用"}
+            </dd>
+          </div>
+          <div className="metric-row">
+            <dt>蓝牙</dt>
+            <dd>
+              {snapshot.bluetooth.controller
+                ? `${snapshot.bluetooth.controller.chipset || "适配器"} · ${
+                    snapshot.bluetooth.controller.poweredOn ? "已开启" : "已关闭"
+                  }`
+                : snapshot.bluetooth.devices.length === 0
+                  ? "不可用"
+                  : "无适配器信息"}
+              {snapshot.bluetooth.devices.length > 0
+                ? ` · ${snapshot.bluetooth.devices.length} 台 · ${snapshot.bluetooth.devices.filter((device) => device.connected).length} 已连接`
+                : ""}
             </dd>
           </div>
           <div className="metric-row">

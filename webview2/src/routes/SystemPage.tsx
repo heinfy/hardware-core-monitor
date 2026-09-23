@@ -30,10 +30,6 @@ export function SystemPage() {
             <dt>架构</dt>
             <dd>{snapshot.system.arch}</dd>
           </div>
-          <div className="metric-row">
-            <dt>CPU 型号</dt>
-            <dd>{snapshot.system.cpuModel}</dd>
-          </div>
         </dl>
       ) : (
         <p className="muted">正在读取系统信息…</p>

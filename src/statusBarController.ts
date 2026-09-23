@@ -30,9 +30,6 @@ export class StatusBarController implements vscode.Disposable {
       [
         text.statusBar.cpuUsage(snapshot.cpu.usage.toFixed(1)),
         text.statusBar.memoryUsage(snapshot.memory.usage.toFixed(1)),
-        snapshot.temperature !== null
-          ? text.statusBar.temperature(snapshot.temperature.toFixed(1))
-          : text.statusBar.temperatureUnavailable(),
         "",
         text.statusBar.openDashboard(),
       ].join("\n"),

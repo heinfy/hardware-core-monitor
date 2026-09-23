@@ -34,10 +34,6 @@ export function SystemCard({ snapshot }: SystemCardProps) {
             <dt>内核</dt>
             <dd>{system.kernel}</dd>
           </div>
-          <div>
-            <dt>CPU</dt>
-            <dd>{system.cpuModel}</dd>
-          </div>
         </dl>
       ) : (
         <p className="muted">系统信息不可用</p>
