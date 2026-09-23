@@ -1,3 +1,9 @@
+## [1.0.11](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.10...v1.0.11) (2026-09-23)
+
+### Bug Fixes
+
+- 添加监控信息、优化监控前端页面 ([330f7bc](https://github.com/heinfy/hardware-core-monitor/commit/330f7bcf7f3d92e3233f1b5ee2ce683f28a6387a))
+
 ## [1.0.10](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.9...v1.0.10) (2026-09-19)
 
 ### Bug Fixes
