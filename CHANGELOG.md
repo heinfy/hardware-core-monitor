@@ -1,3 +1,9 @@
+## [1.0.12](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.11...v1.0.12) (2026-09-27)
+
+### Performance Improvements
+
+- **webview2:** integrate GSAP and OGL for enhanced animations and graphics ([61b830b](https://github.com/heinfy/hardware-core-monitor/commit/61b830b2209a5b8aa841575caddd5922c670ee98))
+
 ## [1.0.11](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.10...v1.0.11) (2026-09-23)
 
 ### Bug Fixes
