@@ -1,3 +1,5 @@
+import { fileURLToPath, URL } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
@@ -7,7 +9,17 @@ import { defineConfig } from "vite";
 // - base 使用相对路径，配合 webview.asWebviewUri 使用；
 // - 开发服务器固定使用 5174 端口，可与 webview 的 5173 同时运行。
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Tailwind v4 由 Vite 插件生成样式，不需要单独的 PostCSS 配置
+    tailwindcss(),
+  ],
+  resolve: {
+    // 与 components.json 的 @ 别名对齐，供 React Bits 组件引用
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   base: "./",
   server: {
     port: 5174,

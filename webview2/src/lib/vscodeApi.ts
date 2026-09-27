@@ -1,4 +1,4 @@
-import type { WebviewToHostMessage } from "../../src/shared/protocol";
+import type { WebviewToHostMessage } from "../../../src/shared/protocol";
 
 /**
  * acquireVsCodeApi 由 VSCode Webview 宿主注入。
@@ -20,7 +20,11 @@ export function getVsCodeApi(): VsCodeApi {
   return api;
 }
 
-/** 发送消息给扩展宿主 */
+/** 发送消息给扩展宿主；浏览器预览里没有宿主注入时直接跳过 */
 export function postToHost(message: WebviewToHostMessage): void {
+  if (typeof acquireVsCodeApi !== "function") {
+    return;
+  }
+
   getVsCodeApi().postMessage(message);
 }

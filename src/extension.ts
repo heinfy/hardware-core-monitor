@@ -22,6 +22,10 @@ const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
 export function activate(context: vscode.ExtensionContext): void {
   // 唯一的数据源：所有 UI 都订阅它
   const monitorService = new MonitorService(SIDEBAR_REFRESH_INTERVAL);
+
+  // 调试 Restart 后恢复两个 Webview，并重新加载最新构建
+  DashboardPanel.registerSerializer(context, monitorService);
+  Webview2Panel.registerSerializer(context, monitorService);
   const treeProvider = new HardwareTreeProvider();
   const statusBar = new StatusBarController();
   const alerter = new ThresholdAlerter();
@@ -140,4 +144,3 @@ export function activate(context: vscode.ExtensionContext): void {
 export function deactivate(): void {
   // 清理逻辑由 context.subscriptions 统一处理，这里不需要额外工作
 }
-

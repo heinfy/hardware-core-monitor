@@ -3,7 +3,7 @@ import type {
   HostToWebviewMessage,
   MonitorSnapshot,
 } from "../../../src/shared/protocol";
-import { postToHost } from "../vscodeApi";
+import { postToHost } from "../lib/vscodeApi";
 
 /**
  * 订阅扩展宿主推送的硬件快照。

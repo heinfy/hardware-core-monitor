@@ -13,6 +13,16 @@
     },
     {
       "type": "shell",
+      "label": "pnpm: build:webview2",
+      "command": "pnpm run build:webview2",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "type": "shell",
       "isBackground": true,
       "label": "pnpm: watch:extension",
       "command": "pnpm run watch:extension",
@@ -46,7 +56,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^vite v",
-          "endsPattern": "(watching for file changes|built in \\d+ms)"
+          "endsPattern": "built in "
         }
       },
       "presentation": {
@@ -66,7 +76,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^vite v",
-          "endsPattern": "(watching for file changes|built in \\d+ms)"
+          "endsPattern": "built in "
         }
       },
       "presentation": {
@@ -75,12 +85,20 @@
     },
     {
       "label": "pnpm: watch:parallel",
-      "dependsOn": ["pnpm: watch:extension", "pnpm: watch:webview"],
+      "dependsOn": [
+        "pnpm: watch:extension",
+        "pnpm: watch:webview",
+        "pnpm: watch:webview2"
+      ],
       "dependsOrder": "parallel"
     },
     {
       "label": "pnpm: prelaunch:dev",
-      "dependsOn": ["pnpm: build:webview", "pnpm: watch:parallel"],
+      "dependsOn": [
+        "pnpm: build:webview",
+        "pnpm: build:webview2",
+        "pnpm: watch:parallel"
+      ],
       "dependsOrder": "sequence"
     },
     {

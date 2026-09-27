@@ -415,7 +415,8 @@ button:active {
   justify-content: space-between;
   gap: 16px;
   padding: 2px 0;
-  border-bottom: 1px dashed color-mix(in srgb, var(--card-border) 80%, transparent);
+  border-bottom: 1px dashed
+    color-mix(in srgb, var(--card-border) 80%, transparent);
 }
 
 .kv-list div:last-child {

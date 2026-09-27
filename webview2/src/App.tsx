@@ -1,9 +1,11 @@
-import { NavLink, Route, Routes } from "react-router-dom";
-import { HomePage } from "./routes/HomePage";
-import { SystemPage } from "./routes/SystemPage";
-import { SettingsPage } from "./routes/SettingsPage";
+import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { MonitorLayout } from "./layouts/MonitorLayout";
+import { HomePage } from "./pages/home/HomePage";
+import { OverviewPage } from "./pages/monitor/OverviewPage";
+import { SettingsPage } from "./pages/monitor/SettingsPage";
+import { SystemPage } from "./pages/monitor/SystemPage";
 
-/** Webview2 根组件：顶部导航 + 前端路由 */
+/** Webview2 根组件：一级导航 + 路由 */
 export function App() {
   return (
     <div className="page">
@@ -11,17 +13,20 @@ export function App() {
         <span className="brand">Webview2</span>
         <div className="nav-links">
           <NavLink to="/" end>
-            概览
+            首页
           </NavLink>
-          <NavLink to="/system">系统信息</NavLink>
-          <NavLink to="/settings">设置</NavLink>
+          <NavLink to="/monitor">监控</NavLink>
         </div>
       </nav>
 
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/system" element={<SystemPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/monitor" element={<MonitorLayout />}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<OverviewPage />} />
+          <Route path="system" element={<SystemPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
         <Route
           path="*"
           element={
