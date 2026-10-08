@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import * as si from "systeminformation";
+import { getRefreshIntervalMs } from "./refreshIntervalConfig";
 import type {
   BluetoothControllerSnapshot,
   BluetoothDeviceSnapshot,
@@ -8,9 +9,6 @@ import type {
 } from "./shared/protocol";
 
 const execFileAsync = promisify(execFile);
-
-/** macOS system_profiler 较慢，降低刷新频率避免拖慢主采集循环 */
-const REFRESH_INTERVAL_MS = 10_000;
 
 let cachedSnapshot: BluetoothSnapshot = { controller: null, devices: [] };
 let lastFetchedAt = 0;
@@ -25,7 +23,7 @@ let collectPromise: Promise<BluetoothSnapshot> | null = null;
 export async function collectBluetooth(): Promise<BluetoothSnapshot> {
   const now = Date.now();
 
-  if (now - lastFetchedAt < REFRESH_INTERVAL_MS) {
+  if (now - lastFetchedAt < getRefreshIntervalMs()) {
     return cachedSnapshot;
   }
 
@@ -66,7 +64,9 @@ async function collectDarwinBluetooth(): Promise<BluetoothSnapshot> {
   const { stdout } = await execFileAsync(
     "system_profiler",
     ["SPBluetoothDataType", "-json"],
-    { maxBuffer: 10 * 1024 * 1024 },
+    {
+      maxBuffer: 10 * 1024 * 1024,
+    },
   );
 
   const payload = JSON.parse(stdout.toString()) as DarwinBluetoothPayload;
@@ -90,7 +90,9 @@ function collectDarwinDevices(
     entry.controller_properties?.controller_address
       ?.toLowerCase()
       .replace(/-/g, ":") ??
-    entry.local_device_title?.general_address?.toLowerCase().replace(/-/g, ":") ??
+    entry.local_device_title?.general_address
+      ?.toLowerCase()
+      .replace(/-/g, ":") ??
     "";
 
   const devices: BluetoothDeviceSnapshot[] = [];

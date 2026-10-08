@@ -112,6 +112,12 @@
           "type": "number",
           "default": 85,
           "description": "%configuration.memoryThreshold.description%"
+        },
+        "hardwareCoreMonitor.refreshIntervalMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 500,
+          "description": "%configuration.refreshIntervalMs.description%"
         }
       }
     }

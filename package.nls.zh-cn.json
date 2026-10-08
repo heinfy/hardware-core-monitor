@@ -12,5 +12,6 @@
   "command.webview2.title": "打开 Webview2（路由页面）",
   "configuration.title": "硬件核心监控",
   "configuration.cpuThreshold.description": "CPU 使用率告警阈值（%）",
-  "configuration.memoryThreshold.description": "内存使用率告警阈值（%）"
+  "configuration.memoryThreshold.description": "内存使用率告警阈值（%）",
+  "configuration.refreshIntervalMs.description": "硬件监控刷新间隔（毫秒），最小 500。"
 }

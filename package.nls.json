@@ -12,5 +12,6 @@
   "command.webview2.title": "Open Webview2 (Routed Page)",
   "configuration.title": "Hardware Core Monitor",
   "configuration.cpuThreshold.description": "CPU usage warning threshold (%)",
-  "configuration.memoryThreshold.description": "Memory usage warning threshold (%)"
+  "configuration.memoryThreshold.description": "Memory usage warning threshold (%)",
+  "configuration.refreshIntervalMs.description": "Hardware monitoring refresh interval (ms). Minimum 500."
 }

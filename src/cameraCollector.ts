@@ -1,12 +1,10 @@
 import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import { promisify } from "node:util";
+import { getRefreshIntervalMs } from "./refreshIntervalConfig";
 import type { CameraSnapshot } from "./shared/protocol";
 
 const execFileAsync = promisify(execFile);
-
-/** system_profiler / v4l2 较慢，降低刷新频率避免拖慢主采集循环 */
-const REFRESH_INTERVAL_MS = 10_000;
 
 let cachedCameras: CameraSnapshot[] = [];
 let lastFetchedAt = 0;
@@ -20,7 +18,7 @@ let collectPromise: Promise<CameraSnapshot[]> | null = null;
 export async function collectCameras(): Promise<CameraSnapshot[]> {
   const now = Date.now();
 
-  if (now - lastFetchedAt < REFRESH_INTERVAL_MS) {
+  if (now - lastFetchedAt < getRefreshIntervalMs()) {
     return cachedCameras;
   }
 
@@ -59,7 +57,9 @@ async function collectDarwinCameras(): Promise<CameraSnapshot[]> {
   const { stdout } = await execFileAsync(
     "system_profiler",
     ["SPCameraDataType", "-json"],
-    { maxBuffer: 10 * 1024 * 1024 },
+    {
+      maxBuffer: 10 * 1024 * 1024,
+    },
   );
 
   const payload = JSON.parse(stdout.toString()) as DarwinCameraPayload;
@@ -108,7 +108,9 @@ async function collectLinuxCamerasFromV4l2(): Promise<CameraSnapshot[]> {
     const { stdout: formatOutput } = await execFileAsync(
       "v4l2-ctl",
       ["-d", devicePath, "--list-formats-ext"],
-      { maxBuffer: 10 * 1024 * 1024 },
+      {
+        maxBuffer: 10 * 1024 * 1024,
+      },
     );
 
     const { maxResolution, frameRate } = parseV4l2Formats(
@@ -171,7 +173,9 @@ async function collectWindowsCameras(): Promise<CameraSnapshot[]> {
   const { stdout } = await execFileAsync(
     "powershell",
     ["-NoProfile", "-Command", script],
-    { maxBuffer: 10 * 1024 * 1024 },
+    {
+      maxBuffer: 10 * 1024 * 1024,
+    },
   );
 
   const payload = stdout.toString().trim();
@@ -181,8 +185,7 @@ async function collectWindowsCameras(): Promise<CameraSnapshot[]> {
   }
 
   const parsed = JSON.parse(payload) as
-    | WindowsCameraRecord
-    | WindowsCameraRecord[];
+    WindowsCameraRecord | WindowsCameraRecord[];
   const records = Array.isArray(parsed) ? parsed : [parsed];
 
   return records.map((record) => ({
@@ -253,9 +256,8 @@ function parseV4l2Formats(output: string): {
       continue;
     }
 
-    const fpsMatch = /Interval:\s*Discrete\s+[\d.]+s\s+\(([\d.]+)\s*fps\)/i.exec(
-      line,
-    );
+    const fpsMatch =
+      /Interval:\s*Discrete\s+[\d.]+s\s+\(([\d.]+)\s*fps\)/i.exec(line);
 
     if (fpsMatch && maxPixels > 0) {
       const fps = Number.parseFloat(fpsMatch[1] ?? "0");

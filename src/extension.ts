@@ -5,10 +5,8 @@ import { text } from "./i18n";
 import { MonitorService } from "./monitorService";
 import { StatusBarController } from "./statusBarController";
 import { ThresholdAlerter } from "./thresholdAlerter";
+import { getRefreshIntervalMs } from "./refreshIntervalConfig";
 import { Webview2Panel } from "./webview2Panel";
-
-/** 侧栏打开时的监控刷新间隔（毫秒） */
-const SIDEBAR_REFRESH_INTERVAL = 10_000;
 
 /** 控制活动栏标题按钮显示状态的上下文键 */
 const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
@@ -21,7 +19,7 @@ const MONITORING_CONTEXT = "hardwareMonitorIsRunning";
  */
 export function activate(context: vscode.ExtensionContext): void {
   // 唯一的数据源：所有 UI 都订阅它
-  const monitorService = new MonitorService(SIDEBAR_REFRESH_INTERVAL);
+  const monitorService = new MonitorService(getRefreshIntervalMs());
 
   // 调试 Restart 后恢复两个 Webview，并重新加载最新构建
   DashboardPanel.registerSerializer(context, monitorService);
@@ -32,7 +30,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const treeView = vscode.window.createTreeView(
     "hardware-core-monitor.sidebarView",
-    { treeDataProvider: treeProvider },
+    {
+      treeDataProvider: treeProvider,
+    },
   );
 
   // 同一份快照同时驱动侧边栏、状态栏和告警
@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext): void {
   /** 根据侧栏可见性自动启停监控 */
   const syncMonitoringWithSidebarVisibility = (visible: boolean): void => {
     if (visible) {
-      monitorService.updateInterval(SIDEBAR_REFRESH_INTERVAL);
+      monitorService.updateInterval(getRefreshIntervalMs());
       monitorService.start();
       void vscode.commands.executeCommand(
         "setContext",
@@ -81,7 +81,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const startMonitoring = vscode.commands.registerCommand(
     "hardware-core-monitor.startMonitoring",
     () => {
-      monitorService.updateInterval(SIDEBAR_REFRESH_INTERVAL);
+      monitorService.updateInterval(getRefreshIntervalMs());
       monitorService.start();
       void vscode.commands.executeCommand(
         "setContext",
@@ -89,6 +89,18 @@ export function activate(context: vscode.ExtensionContext): void {
         true,
       );
       void vscode.window.showInformationMessage(text.monitor.started());
+    },
+  );
+
+  const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
+    (event) => {
+      if (
+        !event.affectsConfiguration("hardwareCoreMonitor.refreshIntervalMs")
+      ) {
+        return;
+      }
+
+      monitorService.updateInterval(getRefreshIntervalMs());
     },
   );
 
@@ -138,6 +150,7 @@ export function activate(context: vscode.ExtensionContext): void {
     refreshMonitoring,
     showDashboard,
     showWebview2,
+    configChangeDisposable,
   );
 }
 
