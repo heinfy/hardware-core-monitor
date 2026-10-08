@@ -1,3 +1,9 @@
+## [1.0.13](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.12...v1.0.13) (2026-10-08)
+
+### Bug Fixes
+
+- **配置:** 新增硬件监控刷新间隔配置项并支持动态更新 ([5a91bbf](https://github.com/heinfy/hardware-core-monitor/commit/5a91bbf6c17721973131f6633aa8ffa15643546f))
+
 ## [1.0.12](https://github.com/heinfy/hardware-core-monitor/compare/v1.0.11...v1.0.12) (2026-09-27)
 
 ### Performance Improvements
