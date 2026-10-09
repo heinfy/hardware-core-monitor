@@ -230,6 +230,8 @@ private async postSnapshot(snapshot: MonitorSnapshot): Promise<void> {
 
 ## 7. 两个 Webview 的关系
 
+命令注册、`activate` 中的 Serializer、双 Vite 工程与 `createWebviewPanel` 流程见 [双Webview注册.md](./双Webview注册.md)。
+
 `Webview2Panel` 不是 Microsoft Edge WebView2，而是第二个 VS Code WebviewPanel。
 
 它与 `DashboardPanel` 的通信原理完全一致，区别只在：
